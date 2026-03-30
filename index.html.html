@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CRM Pipeline — Demo</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --primary: #2C2C2A;
+  --primary2: #444441;
+  --blue: #185FA5;
+  --green: #1D9E75;
+  --amber: #BA7517;
+  --red: #E24B4A;
+  --border: #e0e8f0;
+  --text: #1a3a5c;
+  --muted: #8a9ab0;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 13px; }
+
+/* WELCOME */
+#welcome { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--primary); }
+.wcard { width: 420px; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.wheader { background: var(--primary); padding: 32px 36px 28px; }
+.wlogo { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.wlogo-title { font-size: 20px; font-weight: 700; color: white; letter-spacing: -0.01em; }
+.wbadge { font-size: 10px; font-weight: 600; color: var(--green); background: rgba(29,158,117,0.15); padding: 2px 8px; border-radius: 20px; letter-spacing: 0.07em; text-transform: uppercase; }
+.wsub { font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 18px; font-style: italic; }
+.wdesc { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+.wbody { padding: 28px 36px 32px; }
+.wlabel { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 7px; }
+.winput { width: 100%; padding: 10px 14px; border: 0.5px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; color: var(--text); outline: none; margin-bottom: 14px; transition: border-color 0.15s; }
+.winput:focus { border-color: var(--primary); }
+.wbtn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; }
+.wbtn:hover { background: var(--primary2); }
+.wnote { font-size: 11px; color: #b4b2a9; text-align: center; margin-top: 14px; line-height: 1.6; }
+
+/* APP */
+#app { display: none; flex-direction: column; min-height: 100vh; }
+.topbar { background: var(--primary); padding: 0 20px; display: flex; align-items: center; gap: 12px; height: 50px; position: sticky; top: 0; z-index: 10; }
+.topbar-brand { min-width: 150px; }
+.topbar-title { font-size: 15px; font-weight: 700; color: white; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+.topbar-sub { font-size: 10px; color: rgba(255,255,255,0.4); white-space: nowrap; font-style: italic; }
+.nav { display: flex; gap: 2px; }
+.nav button { background: transparent; border: none; color: rgba(255,255,255,0.6); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit; }
+.nav button.active { background: rgba(255,255,255,0.12); color: white; font-weight: 600; }
+.topbar-actions { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+.btn-add { background: white; color: var(--primary); border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; white-space: nowrap; }
+.btn-ai { background: var(--green); color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; white-space: nowrap; }
+.btn-switch { background: transparent; color: rgba(255,255,255,0.4); border: 0.5px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-family: inherit; }
+.btn-reset { background: transparent; color: rgba(229,115,115,0.8); border: 0.5px solid rgba(229,115,115,0.4); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-family: inherit; }
+
+.main { padding: 20px 24px; flex: 1; }
+.metrics { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; margin-bottom: 20px; }
+.metric-card { background: white; border: 0.5px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.metric-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.metric-value { font-size: 20px; font-weight: 600; color: var(--text); }
+.metric-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* PIPELINE */
+.pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; justify-items: stretch; }
+.stage-col { background: #f8fafc; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; }
+.stage-header { margin-bottom: 10px; }
+.stage-name { font-size: 12px; font-weight: 600; color: var(--text); text-transform: uppercase; letter-spacing: 0.04em; }
+.stage-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.stage-cards { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+
+.deal-card { background: white; border-radius: 8px; border: 0.5px solid var(--border); padding: 12px; border-left: 3px solid var(--border); }
+.deal-card.hot { border-left-color: var(--green); }
+.deal-card.warm { border-left-color: var(--amber); }
+.deal-card.cold { border-left-color: #d0d8e4; }
+.deal-company { font-size: 13px; font-weight: 600; color: var(--text); margin: 6px 0 2px; }
+.deal-title-text { font-size: 11px; color: var(--muted); margin-bottom: 6px; line-height: 1.3; }
+.deal-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.deal-value { font-size: 13px; font-weight: 600; color: var(--text); }
+.badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+.badge.green { background: #EAF3DE; color: #27500A; }
+.badge.amber { background: #FAEEDA; color: #633806; }
+.badge.gray { background: #f0f4f8; color: var(--muted); }
+.score-bar { height: 3px; background: #f0f4f8; border-radius: 2px; margin-bottom: 6px; }
+.score-fill { height: 3px; border-radius: 2px; }
+.score-fill.green { background: var(--green); }
+.score-fill.amber { background: var(--amber); }
+.score-fill.gray { background: #d0d8e4; }
+.deal-meta-row { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
+.act-btns { display: flex; gap: 4px; margin-top: 8px; border-top: 0.5px solid var(--border); padding-top: 8px; }
+.act-btn { flex: 1; background: #fafbfc; border: 0.5px solid var(--border); border-radius: 6px; padding: 5px 0; cursor: pointer; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 1px; font-family: inherit; }
+.act-btn.locked { background: #EAF3DE; border-color: var(--green); cursor: default; }
+.act-count { font-size: 9px; color: var(--muted); font-weight: 600; }
+
+/* STAGE DROPDOWN */
+.stage-drop-wrap { position: relative; display: inline-block; }
+.stage-drop-trigger { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+.stage-drop-menu { position: absolute; top: 100%; left: 0; background: white; border: 0.5px solid var(--border); border-radius: 6px; z-index: 50; min-width: 130px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.stage-drop-item { padding: 8px 12px; font-size: 12px; cursor: pointer; color: #5a6a7a; }
+.stage-drop-item:hover { background: #f0f4f8; }
+.stage-drop-item.active { color: var(--text); font-weight: 600; background: #f0f4f8; }
+.stage-drop-item.won { color: var(--green); }
+.stage-drop-item.lost { color: var(--red); }
+.stage-drop-divider { border-top: 0.5px solid var(--border); }
+
+/* PRIORITY */
+.priority-list { display: flex; flex-direction: column; gap: 4px; }
+.priority-row { background: white; border: 0.5px solid var(--border); border-radius: 6px; padding: 8px 16px; display: flex; align-items: center; gap: 12px; }
+.rank { font-size: 13px; font-weight: 700; color: var(--muted); min-width: 28px; }
+.rank.top { color: var(--primary); }
+
+/* FUNNEL */
+.funnel-wrap { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.funnel-bar { border-radius: 6px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; transition: width 0.5s; }
+.funnel-arrow { width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; }
+
+/* FORECAST */
+.forecast-target-bar { background: var(--primary); border-radius: 10px; padding: 10px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 16px; min-height: 56px; }
+.target-label { font-size: 10px; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.target-input { background: rgba(255,255,255,0.15); border: 0.5px solid rgba(255,255,255,0.35); border-radius: 6px; padding: 6px 12px 6px 22px; font-size: 14px; font-weight: 500; color: white; outline: none; width: 180px; font-family: inherit; }
+.target-input::placeholder { color: rgba(255,255,255,0.4); }
+.target-divider { width: 1px; align-self: stretch; background: rgba(255,255,255,0.2); margin: 0 4px; }
+.target-monthly { font-size: 15px; font-weight: 500; color: white; }
+.target-reset { font-size: 12px; padding: 6px 12px; border-radius: 6px; border: 0.5px solid rgba(255,255,255,0.3); background: transparent; color: rgba(255,255,255,0.7); cursor: pointer; font-family: inherit; }
+.forecast-metrics { display: flex; gap: 12px; margin-bottom: 20px; }
+.forecast-chart { background: white; border-radius: 10px; border: 0.5px solid var(--border); padding: 20px 24px; }
+.month-rows { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+.month-row { background: white; border-radius: 8px; border: 0.5px solid var(--border); padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+
+/* CLOSED */
+.closed-list { display: flex; flex-direction: column; gap: 4px; }
+.closed-row { background: white; border-radius: 8px; border: 0.5px solid var(--border); padding: 8px 14px; display: flex; align-items: center; gap: 10px; border-left: 3px solid; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+
+/* MODAL / PANEL */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; }
+.side-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 380px; background: white; z-index: 100; box-shadow: -4px 0 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+.panel-header { padding: 20px 24px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.panel-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+.panel-footer { padding: 16px 24px; border-top: 0.5px solid var(--border); }
+.finput { width: 100%; padding: 8px 10px; border: 0.5px solid #d0d8e4; border-radius: 6px; font-size: 13px; font-family: inherit; color: var(--text); outline: none; background: white; }
+.flabel { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
+.fgroup { margin-bottom: 14px; }
+.fsection { font-size: 11px; font-weight: 600; color: #5a6a7a; text-transform: uppercase; letter-spacing: 0.06em; margin: 16px 0 12px; }
+.btn-save { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.btn-cancel { flex: 1; padding: 10px; border: 0.5px solid var(--border); border-radius: 6px; background: white; cursor: pointer; font-size: 13px; font-family: inherit; }
+.btn-confirm { flex: 1; padding: 10px; border: none; border-radius: 6px; background: var(--primary); color: white; cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit; }
+.filter-btn { padding: 6px 16px; border-radius: 20px; border: 0.5px solid var(--border); background: white; color: #5a6a7a; font-size: 12px; cursor: pointer; font-weight: 400; font-family: inherit; }
+.filter-btn.active { background: var(--primary); color: white; font-weight: 600; border-color: var(--primary); }
+
+/* LOSS MODAL */
+.loss-modal-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; display: flex; align-items: center; justify-content: center; }
+.loss-modal { background: white; border-radius: 12px; width: 380px; overflow: hidden; }
+.loss-modal-header { background: var(--red); padding: 14px 20px; }
+
+/* CHART BAR */
+.chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 200px; position: relative; }
+.chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; height: 100%; justify-content: flex-end; }
+.chart-bar { width: 80%; border-radius: 3px 3px 0 0; opacity: 0.85; z-index: 1; }
+.chart-label { font-size: 9px; color: var(--muted); text-align: center; cursor: pointer; line-height: 1.3; }
+.dashed-line { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--red); z-index: 2; }
+
+/* DONUT */
+.donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.donut-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+.pipeline-chart-wrap { background: white; border-radius: 10px; border: 0.5px solid var(--border); padding: 20px 24px; margin-bottom: 20px; }
+.pipeline-bars { display: flex; align-items: flex-end; gap: 8px; height: 160px; overflow-x: auto; padding-bottom: 8px; justify-content: center; }
+.pipeline-bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 52px; flex: 0 0 52px; }
+.progress-bar { flex: 1; background: #f0f4f8; border-radius: 4px; height: 6px; }
+.progress-fill { height: 6px; border-radius: 4px; transition: width 0.5s; }
+
+.error-msg { background: #FCEBEB; color: #A32D2D; padding: 10px 12px; border-radius: 6px; font-size: 12px; margin-top: 8px; }
+.success-msg { background: #EAF3DE; color: #27500A; padding: 10px 12px; border-radius: 6px; font-size: 12px; margin-top: 8px; }
+.loading { text-align: center; padding: 60px; color: var(--muted); font-size: 14px; }
+
+select.finput { cursor: pointer; }
+textarea.finput { resize: none; height: 64px; }
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div id="welcome">
+  <div class="wcard">
+    <div class="wheader">
+      <div class="wlogo">
+        <div class="wlogo-title">CRM Pipeline</div>
+        <div class="wbadge">Demo</div>
+      </div>
+      <div class="wsub">Predictive Sales Engine &nbsp;·&nbsp; <em>by CES Org.</em></div>
+      <div class="wdesc">A structured commercial system for pipeline predictability, GP forecasting, and disciplined deal execution.</div>
+    </div>
+    <div class="wbody">
+      <label class="wlabel">Your name</label>
+      <input class="winput" id="nameInput" type="text" placeholder="e.g. Joe, Diego, Alvaro..." autofocus />
+      <button class="wbtn" onclick="startDemo()">Start demo →</button>
+      <div class="wnote">Your session is personal — data resets when you close the tab.<br/>No account needed.</div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-title">
+        CRM Pipeline
+        <span style="font-size:10px;font-weight:600;color:var(--green);background:rgba(29,158,117,0.2);padding:2px 8px;border-radius:20px;letter-spacing:0.07em;text-transform:uppercase;">Demo</span>
+      </div>
+      <div class="topbar-sub"><em>by CES Org.</em> &nbsp;·&nbsp; <span id="userLabel"></span>'s pipeline</div>
+    </div>
+    <div class="nav">
+      <button onclick="setView('pipeline')" id="nav-pipeline" class="active">Pipeline</button>
+      <button onclick="setView('forecast')" id="nav-forecast">Forecast</button>
+      <button onclick="setView('priority')" id="nav-priority">Priority</button>
+      <button onclick="setView('closed')" id="nav-closed">Closed</button>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-add" onclick="openAdd()">+ Add deal</button>
+      <button class="btn-ai" onclick="runAI()">Run AI</button>
+      <button class="btn-reset" onclick="resetPipeline()">Reset pipeline</button>
+      <button class="btn-switch" onclick="switchUser()">Switch user</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- METRICS -->
+    <div class="metrics" id="metricsBar"></div>
+    <!-- VIEWS -->
+    <div id="view-pipeline"></div>
+    <div id="view-priority" style="display:none"></div>
+
+    <div id="view-forecast" style="display:none"></div>
+    <div id="view-closed" style="display:none"></div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="dealPanel" style="display:none">
+  <div class="overlay" onclick="closePanel()"></div>
+  <div class="side-panel">
+    <div class="panel-header">
+      <div>
+        <div style="font-size:16px;font-weight:600;color:var(--text)" id="panelTitle">Add new deal</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">All fields editable</div>
+      </div>
+      <button onclick="closePanel()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--muted)">×</button>
+    </div>
+    <div class="panel-body" id="panelBody"></div>
+    <div class="panel-footer">
+      <button class="btn-save" id="panelSaveBtn" onclick="savePanel()">Save deal</button>
+    </div>
+  </div>
+</div>
+
+<div id="lossModal" style="display:none">
+  <div class="loss-modal-wrap">
+    <div class="loss-modal">
+      <div class="loss-modal-header">
+        <div style="font-size:13px;font-weight:600;color:white">Why was this deal lost?</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px" id="lossModalSub"></div>
+      </div>
+      <div style="padding:16px 20px;display:flex;flex-direction:column;gap:12px">
+        <div>
+          <div class="flabel" style="margin-bottom:6px">Loss reason</div>
+          <select class="finput" id="lossReason">
+            <option>Price</option><option>Competitor</option><option>No decision</option>
+            <option>Timing</option><option>Relationship</option><option>Out of scope</option><option>Other</option>
+          </select>
+        </div>
+        <div>
+          <div class="flabel" style="margin-bottom:6px">Notes (optional)</div>
+          <textarea class="finput" id="lossNotes" placeholder="e.g. Lost to competitor on rate"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="btn-cancel" onclick="closeLossModal()">Cancel</button>
+          <button class="btn-confirm" onclick="confirmLoss()">Confirm lost</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ── DATA ──────────────────────────────────────────────────────────
+const STAGES = ['Lead','Qualified','Proposal','Negotiation']
+const ALL_STAGES = [...STAGES,'Closed Won','Closed Lost']
+const LOSS_REASONS = ['Price','Competitor','No decision','Timing','Relationship','Out of scope','Other']
+const REASON_COLORS = {Price:'#BA7517',Competitor:'#E24B4A','No decision':'#185FA5',Timing:'#888780',Relationship:'#5DCAA5','Out of scope':'#7F77DD',Other:'#b4b2a9'}
+const STAGE_COLORS = {Lead:'#b4b2a9',Qualified:'#185FA5',Proposal:'#1D9E75',Negotiation:'#BA7517'}
+const COUNTRIES = ['Mexico','Colombia','Brazil','Peru','Argentina','Chile','Costa Rica','Guatemala','Ecuador','USA','Canada','Other']
+const INDUSTRIES = ['FMCG','Reefer','Retail','Automotive','Chemicals','Logistics','Lifestyle','Other']
+const CURRENCIES = ['USD','EUR','GBP','BRL','MXN']
+
+let demoUser = ''
+let deals = []
+let closedDeals = []
+let nextId = 1000
+let currentView = 'pipeline'
+let editingDealId = null
+let lossTarget = null
+let annualTarget = 1000000
+let monthTargets = (function(){const t={};for(let i=1;i<=12;i++)t['2026-'+String(i).padStart(2,'0')]=Math.round(1000000/12);return t})()
+let donutChart = null
+
+const SEED = [
+  {contact:'Carlos Mendoza',company:'Andean Fresh Foods',country:'Colombia',industry:'Reefer',title:'Andean Fresh — Reefer Export Lane',value:84000,stage:'Negotiation',duration:12,date:'2026-04-01'},
+  {contact:'Maria Gutierrez',company:'TechParts LATAM',country:'Mexico',industry:'Automotive',title:'TechParts — Auto Components Export',value:120000,stage:'Proposal',duration:24,date:'2026-05-01'},
+  {contact:'Rafael Silva',company:'BioFarm Brasil',country:'Brazil',industry:'FMCG',title:'BioFarm — FCL Export Lane',value:56000,stage:'Qualified',duration:12,date:'2026-06-01'},
+  {contact:'Ana Torres',company:'Lima Exports SA',country:'Peru',industry:'FMCG',title:'Lima Exports — LCL Consolidation',value:38000,stage:'Lead',duration:6,date:'2026-07-01'},
+  {contact:'Jorge Vargas',company:'Andina Retail Group',country:'Chile',industry:'Retail',title:'Andina Retail — Full Container Export',value:95000,stage:'Proposal',duration:12,date:'2026-05-15'},
+  {contact:'Sofia Reyes',company:'CosmeticaCR',country:'Costa Rica',industry:'Lifestyle',title:'CosmeticaCR — Express Export Lane',value:27000,stage:'Negotiation',duration:6,date:'2026-04-15'},
+  {contact:'Luis Herrera',company:'Quimex Industrial',country:'Mexico',industry:'Chemicals',title:'Quimex — Hazmat Export Lane',value:145000,stage:'Qualified',duration:18,date:'2026-08-01'},
+  {contact:'Patricia Rojas',company:'AgriPeru Export',country:'Peru',industry:'Reefer',title:'AgriPeru — Reefer Export Lane',value:62000,stage:'Proposal',duration:12,date:'2026-06-15'},
+  {contact:'Diego Morales',company:'ElectroArg',country:'Argentina',industry:'Retail',title:'ElectroArg — Electronics Export',value:78000,stage:'Lead',duration:12,date:'2026-09-01'},
+  {contact:'Valentina Cruz',company:'GuateFresh SA',country:'Guatemala',industry:'Reefer',title:'GuateFresh — Perishables Export Lane',value:44000,stage:'Negotiation',duration:6,date:'2026-04-01'},
+  {contact:'Andres Fuentes',company:'ColTex Apparel',country:'Colombia',industry:'Retail',title:'ColTex — Garments Export Lane',value:33000,stage:'Lead',duration:6,date:'2026-07-15'},
+  {contact:'Isabella Mora',company:'PharmaAndes',country:'Colombia',industry:'Chemicals',title:'PharmaAndes — Pharma Consolidation',value:91000,stage:'Qualified',duration:12,date:'2026-05-01'},
+  {contact:'Marco Delgado',company:'BrazilNuts Co',country:'Brazil',industry:'FMCG',title:'BrazilNuts — Bulk Commodity Export',value:48000,stage:'Lead',duration:6,date:'2026-08-15'},
+  {contact:'Lucia Fernandez',company:'Vino del Sur',country:'Argentina',industry:'FMCG',title:'Vino del Sur — Wine Export Lane',value:67000,stage:'Proposal',duration:12,date:'2026-06-01'},
+  {contact:'Rodrigo Campos',company:'AutoMex Parts',country:'Mexico',industry:'Automotive',title:'AutoMex — Spare Parts Distribution',value:110000,stage:'Negotiation',duration:18,date:'2026-04-15'},
+  {contact:'Camila Vargas',company:'TropicFresh CR',country:'Costa Rica',industry:'Reefer',title:'TropicFresh — Pineapple Export Lane',value:52000,stage:'Qualified',duration:6,date:'2026-05-15'},
+  {contact:'Fernando Castro',company:'Ecuaflor',country:'Ecuador',industry:'Reefer',title:'Ecuaflor — Fresh Flowers Export',value:39000,stage:'Proposal',duration:12,date:'2026-07-01'},
+  {contact:'Natalia Rios',company:'BoliTex Fabrics',country:'Peru',industry:'Retail',title:'BoliTex — Textile Export Consolidation',value:29000,stage:'Lead',duration:6,date:'2026-09-15'},
+  {contact:'Sebastian Lara',company:'ChileFrut SA',country:'Chile',industry:'Reefer',title:'ChileFrut — Stone Fruit Export Lane',value:74000,stage:'Negotiation',duration:12,date:'2026-04-01'},
+  {contact:'Gabriela Mendez',company:'GuateCafe Export',country:'Guatemala',industry:'FMCG',title:'GuateCafe — Green Coffee Export',value:58000,stage:'Qualified',duration:12,date:'2026-06-01'},
+]
+
+// ── HELPERS ───────────────────────────────────────────────────────
+const fmt = n => n ? '$'+Number(n).toLocaleString('en-US',{maximumFractionDigits:0}) : '$0'
+const pct = n => n ? Math.round(n*100)+'%' : '0%'
+const fmtComma = n => n ? Number(n).toLocaleString('en-US') : ''
+const parseComma = s => Number(String(s).replace(/,/g,''))||0
+
+function scoreDeal(deal) {
+  const stageW = {Lead:0.1,Qualified:0.3,Proposal:0.6,Negotiation:0.8,'Closed Won':1,'Closed Lost':0}
+  const actBonus = Math.min(0.2, ((deal.calls||0)*0.03+(deal.emails||0)*0.02+(deal.meetings||0)*0.05+(deal.proposal?0.08:0)))
+  const base = (stageW[deal.stage]||0.1) + actBonus
+  const prob = Math.min(0.95, base)
+  const score = Math.round(prob*100*0.7 + (deal.value/200000)*30)
+  return {ai_probability: prob, lead_score: Math.min(100,score)}
+}
+
+function badgeClass(score) {
+  if (score >= 60) return 'green'
+  if (score >= 30) return 'amber'
+  return 'gray'
+}
+
+function priorityClass(score) {
+  if (score >= 60) return 'hot'
+  if (score >= 30) return 'warm'
+  return 'cold'
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+function startDemo() {
+  const name = document.getElementById('nameInput').value.trim()
+  if (!name) return
+  demoUser = name
+  document.getElementById('userLabel').textContent = name
+  document.getElementById('welcome').style.display = 'none'
+  document.getElementById('app').style.display = 'flex'
+  // Seed deals
+  SEED.forEach((s,i) => {
+    const d = {
+      id: nextId++,
+      contact: s.contact, company: s.company, country: s.country,
+      industry: s.industry, title: s.title, value: s.value,
+      stage: s.stage, duration: s.duration, date: s.date,
+      currency: 'USD', email: '', brought_by: name,
+      calls:0, emails:0, meetings:0, proposal:false,
+      loss_reason:null, loss_notes:null
+    }
+    const sc = scoreDeal(d)
+    d.ai_probability = sc.ai_probability
+    d.lead_score = sc.lead_score
+    deals.push(d)
+  })
+
+  // Seed closed deals
+  const CLOSED_SEED = [
+    {contact:'Mauricio Paz',company:'PacificCargo SA',country:'Peru',industry:'Logistics',title:'PacificCargo — FCL Export Program',value:72000,stage:'Closed Won',duration:12,date:'2026-02-01',closed_outcome:'won',loss_reason:null,loss_notes:null,calls:3,emails:5,meetings:2,proposal:true},
+    {contact:'Elena Varga',company:'NordRetail Chile',country:'Chile',industry:'Retail',title:'NordRetail — Full Container Lane',value:88000,stage:'Closed Won',duration:12,date:'2026-03-01',closed_outcome:'won',loss_reason:null,loss_notes:null,calls:4,emails:6,meetings:3,proposal:true},
+    {contact:'Roberto Salas',company:'MexChem Export',country:'Mexico',industry:'Chemicals',title:'MexChem — Hazmat Consolidation',value:105000,stage:'Closed Lost',duration:18,date:'2026-03-15',closed_outcome:'lost',loss_reason:'Price',loss_notes:'Client went with a carrier offering 12% lower all-in rate. Could not match on volume discount.',calls:2,emails:4,meetings:1,proposal:true},
+    {contact:'Daniela Rios',company:'AgroBrasil Foods',country:'Brazil',industry:'FMCG',title:'AgroBrasil — Reefer Lane Proposal',value:61000,stage:'Closed Lost',duration:12,date:'2026-02-15',closed_outcome:'lost',loss_reason:'Competitor',loss_notes:'Lost to incumbent forwarder — long-standing relationship made it difficult to displace despite better rates.',calls:3,emails:3,meetings:2,proposal:true},
+    {contact:'Tomás Guerrero',company:'ColFlower Export',country:'Colombia',industry:'Reefer',title:'ColFlower — Perishables Export Lane',value:47000,stage:'Closed Lost',duration:6,date:'2026-01-15',closed_outcome:'lost',loss_reason:'No decision',loss_notes:'Budget freeze for Q1. Prospect indicated they may revisit in Q3 2026.',calls:1,emails:2,meetings:1,proposal:false},
+  ]
+  CLOSED_SEED.forEach(s => {
+    closedDeals.push({
+      id: nextId++,
+      contact: s.contact, company: s.company, country: s.country,
+      industry: s.industry, title: s.title, value: s.value,
+      stage: s.stage, duration: s.duration, date: s.date,
+      currency: 'USD', email: '', brought_by: name,
+      calls: s.calls||0, emails: s.emails||0, meetings: s.meetings||0, proposal: s.proposal||false,
+      closed_outcome: s.closed_outcome,
+      loss_reason: s.loss_reason, loss_notes: s.loss_notes,
+      ai_probability: s.closed_outcome==='won'?0.95:0.1,
+      lead_score: s.closed_outcome==='won'?85:15
+    })
+  })
+
+  rankDeals()
+  renderAll()
+}
+
+function resetPipeline() {
+  if (!confirm('This will remove all deals from your pipeline. Your session will remain active. Continue?')) return
+  deals = []
+  closedDeals = []
+  nextId = 1000
+  renderAll()
+}
+
+function switchUser() {
+  deals = []; closedDeals = []; nextId = 1000
+  annualTarget = 0; monthTargets = {}
+  document.getElementById('app').style.display = 'none'
+  document.getElementById('welcome').style.display = 'flex'
+  document.getElementById('nameInput').value = ''
+}
+
+function runAI() {
+  deals.forEach(d => { const sc = scoreDeal(d); d.ai_probability = sc.ai_probability; d.lead_score = sc.lead_score })
+  rankDeals()
+  renderAll()
+}
+
+function rankDeals() {
+  const sorted = [...deals].sort((a,b) => b.lead_score - a.lead_score)
+  sorted.forEach((d,i) => d.priority_rank = i+1)
+}
+
+// ── VIEWS ─────────────────────────────────────────────────────────
+function setView(v) {
+  currentView = v
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'))
+  document.getElementById('nav-'+v)?.classList.add('active')
+  ;['pipeline','priority','forecast','closed'].forEach(name => {
+    document.getElementById('view-'+name).style.display = name===v ? '' : 'none'
+  })
+  renderView(v)
+}
+
+function renderAll() {
+  renderMetrics()
+  renderView(currentView)
+}
+
+function renderView(v) {
+  renderMetrics()
+  if (v==='pipeline') renderPipeline()
+  else if (v==='forecast') renderForecast()
+  else if (v==='priority') renderPriority()
+  else if (v==='closed') renderClosed()
+}
+
+// ── METRICS ───────────────────────────────────────────────────────
+function renderMetrics() {
+  const totalGP = deals.reduce((s,d)=>s+d.value,0)
+  const avgWin = deals.length ? deals.reduce((s,d)=>s+d.ai_probability,0)/deals.length : 0
+  const exp2026 = calcExpected2026()
+  const gap = annualTarget > 0 ? annualTarget - exp2026 : null
+  const gapVal = gap===null ? '—' : gap<=0 ? '✓ On target' : '('+fmt(gap)+')'
+  const gapColor = gap===null ? 'var(--muted)' : gap<=0 ? 'var(--green)' : 'var(--red)'
+  const gapSub = gap!==null ? 'vs annual target' : 'set target in Forecast'
+  document.getElementById('metricsBar').innerHTML = [
+    {label:'Active deals',value:deals.length,sub:'across 4 stages',color:null},
+    {label:'Pipeline GP',value:fmt(totalGP),sub:'total open GP',color:null},
+    {label:'2026 GP Forecast',value:fmt(exp2026),sub:'won + pipeline weighted',color:null},
+    {label:'2026 GP Gap',value:gapVal,sub:gapSub,color:gapColor},
+    {label:'Avg win probability',value:Math.round(avgWin*100)+'%',sub:'AI model v1.0',color:null},
+  ].map(m=>`
+    <div class="metric-card">
+      <div class="metric-label">${m.label}</div>
+      <div class="metric-value" style="${m.color?'color:'+m.color:''}">${m.value}</div>
+      <div class="metric-sub">${m.sub}</div>
+    </div>
+  `).join('')
+}
+
+function calcExpected2026() {
+  let total = 0
+  deals.forEach(d => {
+    if (!d.date) return
+    const gp = d.value, dur = d.duration||12, prob = d.ai_probability||0
+    const monthly = (gp*prob)/dur
+    const start = new Date(d.date)
+    for (let i=0;i<dur;i++) {
+      const dt = new Date(start.getFullYear(),start.getMonth()+i,1)
+      if (dt.getFullYear()===2026) total+=monthly
+    }
+  })
+  closedDeals.filter(d=>d.closed_outcome==='won').forEach(d => {
+    if (!d.date) return
+    const gp = d.value, dur = d.duration||12
+    const monthly = gp/dur
+    const start = new Date(d.date)
+    for (let i=0;i<dur;i++) {
+      const dt = new Date(start.getFullYear(),start.getMonth()+i,1)
+      if (dt.getFullYear()===2026) total+=monthly
+    }
+  })
+  return total
+}
+
+// ── PIPELINE ──────────────────────────────────────────────────────
+function renderPipeline() {
+  const el = document.getElementById('view-pipeline')
+  // Bar chart
+  const sorted = [...deals].sort((a,b)=>b.value-a.value).slice(0,15)
+  const maxV = Math.max(...sorted.map(d=>d.value),1)
+  const bars = sorted.map(d=>{
+    const h = Math.max(8,(d.value/maxV)*140)
+    const col = STAGE_COLORS[d.stage]||'#b4b2a9'
+    return `<div class="pipeline-bar-col">
+      <div style="font-size:10px;color:var(--text);font-weight:600">${d.value>=1000?Math.round(d.value/1000)+'K':d.value}</div>
+      <div style="width:100%;height:${h}px;background:${col};border-radius:4px 4px 0 0;opacity:0.85" title="${d.title}"></div>
+      <div style="font-size:9px;color:var(--muted);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:52px">${d.company.split(' ')[0]}</div>
+    </div>`
+  }).join('')
+  const legend = Object.entries(STAGE_COLORS).map(([s,c])=>`
+    <div style="display:flex;align-items:center;gap:4px">
+      <div style="width:8px;height:8px;border-radius:2px;background:${c}"></div>
+      <span style="font-size:11px;color:var(--muted)">${s}</span>
+    </div>`).join('')
+
+  // Kanban
+  const kanban = STAGES.map(stage=>{
+    const sd = deals.filter(d=>d.stage===stage)
+    const total = sd.reduce((s,d)=>s+d.value,0)
+    const cards = sd.length===0
+      ? `<div style="font-size:11px;color:#b4b2a9;padding:8px 0;text-align:center">No deals</div>`
+      : sd.map(d=>dealCardHTML(d)).join('')
+    return `<div class="stage-col">
+      <div class="stage-header">
+        <div class="stage-name">${stage}</div>
+        <div class="stage-meta">${sd.length} deals · ${fmt(total)}</div>
+      </div>
+      <div class="stage-cards">${cards}</div>
+    </div>`
+  }).join('')
+
+  el.innerHTML = `
+    <div class="pipeline-chart-wrap">
+      <div style="font-size:12px;font-weight:600;color:#5a6a7a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:16px">Pipeline by GP</div>
+      <div class="pipeline-bars">${bars}</div>
+      <div style="display:flex;gap:16px;margin-top:12px;justify-content:center">${legend}</div>
+    </div>
+    <div class="pipeline" style="max-width:1200px;margin:0 auto">${kanban}</div>
+  `
+}
+
+function dealCardHTML(d) {
+  const b = badgeClass(d.lead_score||0)
+  const p = priorityClass(d.lead_score||0)
+  const sw = Math.min(100,d.lead_score||0)+'%'
+  const actBtns = [
+    {type:'call',label:'📞',count:d.calls||0},
+    {type:'email',label:'✉',count:d.emails||0},
+    {type:'meeting',label:'🤝',count:d.meetings||0},
+    {type:'proposal',label:'📄',count:d.proposal?1:0},
+  ].map(btn=>{
+    const locked = btn.type==='proposal' && btn.count>0
+    return `<button class="act-btn${locked?' locked':''}" onclick="${locked?'':`logAct(${d.id},'${btn.type}')`}" style="opacity:1">
+      <span style="font-size:13px">${locked?'✓':btn.label}</span>
+      ${btn.count>0?`<span class="act-count">${btn.count}</span>`:''}
+    </button>`
+  }).join('')
+
+  return `<div class="deal-card ${p}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      ${stageDropHTML(d)}
+      <div style="display:flex;gap:4px">
+        <button onclick="openEdit(${d.id})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px;padding:0 2px">✎</button>
+        <button onclick="deleteDeal(${d.id})" style="background:none;border:none;cursor:pointer;color:#b4b2a9;font-size:14px;padding:0 2px">×</button>
+      </div>
+    </div>
+    <div class="deal-company">${d.company}</div>
+    <div class="deal-title-text">${d.title}</div>
+    <div class="deal-row">
+      <span class="deal-value">${fmt(d.value)}</span>
+      <span class="badge ${b}">${pct(d.ai_probability)} win</span>
+    </div>
+    <div class="score-bar"><div class="score-fill ${b}" style="width:${sw}"></div></div>
+    <div class="deal-meta-row">
+      <span>Score ${(d.lead_score||0).toFixed(1)} · #${d.priority_rank}</span>
+      <span>${d.brought_by?'by '+d.brought_by:''}</span>
+    </div>
+    <div class="act-btns">${actBtns}</div>
+  </div>`
+}
+
+function stageDropHTML(d) {
+  const items = STAGES.map(s=>`<div class="stage-drop-item${s===d.stage?' active':''}" onclick="changeStage(${d.id},'${s}')">${s}</div>`).join('')
+  return `<div class="stage-drop-wrap">
+    <div class="stage-drop-trigger" onclick="toggleDrop(this)">${d.stage} <span style="font-size:8px">▼</span></div>
+    <div class="stage-drop-menu" style="display:none">
+      ${items}
+      <div class="stage-drop-divider"></div>
+      <div class="stage-drop-item won" onclick="changeStage(${d.id},'Closed Won')">Closed Won</div>
+      <div class="stage-drop-item lost" onclick="openLossModal(${d.id})">Closed Lost</div>
+    </div>
+  </div>`
+}
+
+function toggleDrop(el) {
+  const menu = el.nextElementSibling
+  const isOpen = menu.style.display === 'block'
+  document.querySelectorAll('.stage-drop-menu').forEach(m => m.style.display='none')
+  if (!isOpen) menu.style.display = 'block'
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.stage-drop-wrap')) document.querySelectorAll('.stage-drop-menu').forEach(m=>m.style.display='none')
+})
+
+function changeStage(id, stage) {
+  const d = deals.find(d=>d.id===id)
+  if (!d) return
+  if (stage==='Closed Won') {
+    d.stage = 'Closed Won'
+    d.closed_outcome = 'won'
+    closedDeals.push({...d})
+    deals = deals.filter(x=>x.id!==id)
+  } else {
+    d.stage = stage
+  }
+  runAI()
+}
+
+function logAct(id, type) {
+  const d = deals.find(d=>d.id===id)
+  if (!d) return
+  if (type==='call') d.calls=(d.calls||0)+1
+  else if (type==='email') d.emails=(d.emails||0)+1
+  else if (type==='meeting') d.meetings=(d.meetings||0)+1
+  else if (type==='proposal') d.proposal=true
+  const sc = scoreDeal(d); d.ai_probability=sc.ai_probability; d.lead_score=sc.lead_score
+  rankDeals(); renderAll()
+}
+
+function deleteDeal(id) {
+  if (!confirm('Delete this deal?')) return
+  deals = deals.filter(d=>d.id!==id)
+  renderAll()
+}
+
+// ── PRIORITY ──────────────────────────────────────────────────────
+function renderPriority() {
+  const sorted = [...deals].sort((a,b)=>(a.priority_rank||99)-(b.priority_rank||99))
+  document.getElementById('view-priority').innerHTML = `<div class="priority-list">${sorted.map((d,i)=>`
+    <div class="priority-row">
+      <div class="rank${i<3?' top':''}">  #${d.priority_rank}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${d.company}</div>
+        <div style="font-size:11px;color:var(--muted)">${d.title}</div>
+      </div>
+      ${stageDropHTML(d)}
+      <div style="text-align:right">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${fmt(d.value)}</div>
+        <div style="font-size:10px;color:var(--muted)">GP</div>
+      </div>
+      <span class="badge ${badgeClass(d.lead_score||0)}">${pct(d.ai_probability)}</span>
+      <div style="text-align:right;min-width:70px">
+        <div style="font-size:11px;color:var(--muted)">Score ${(d.lead_score||0).toFixed(1)}</div>
+      </div>
+      <button onclick="openEdit(${d.id})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;padding:0 3px">✎</button>
+      <button onclick="deleteDeal(${d.id})" style="background:none;border:none;cursor:pointer;color:#b4b2a9;font-size:15px;padding:0 3px">×</button>
+    </div>`).join('')}</div>`
+}
+
+// ── FUNNEL ────────────────────────────────────────────────────────
+function renderFunnel() {
+  const fdata = STAGES.map(s=>({stage:s,count:deals.filter(d=>d.stage===s).length,value:deals.filter(d=>d.stage===s).reduce((a,d)=>a+d.value,0)}))
+  const maxV = Math.max(...fdata.map(f=>f.value),1)
+  const colors = ['#2C2C2A','#185FA5','#1D9E75','#BA7517']
+  const light = ['#D3D1C7','#B5D4F4','#D6F0E0','#FAEEDA']
+  const bars = fdata.map((f,i)=>{
+    const w = 30+(f.value/maxV)*70
+    return `<div style="display:flex;flex-direction:column;align-items:center;margin-bottom:6px">
+      <div class="funnel-bar" style="width:${w}%;background:${colors[i]}">
+        <span style="color:white;font-weight:600;font-size:14px">${f.stage}</span>
+        <div style="text-align:right">
+          <div style="color:white;font-weight:600;font-size:14px">${fmt(f.value)}</div>
+          <div style="color:${light[i]};font-size:11px;margin-top:2px">${f.count} deals</div>
+        </div>
+      </div>
+      ${i<fdata.length-1?`<div class="funnel-arrow" style="border-top:10px solid ${colors[i]}"></div>`:''}
+    </div>`
+  }).join('')
+  const total = fdata.reduce((s,f)=>s+f.value,0)
+  const totalDeals = fdata.reduce((s,f)=>s+f.count,0)
+  document.getElementById('view-funnel').innerHTML = `
+    <div class="funnel-wrap">${bars}</div>
+    <div style="max-width:680px;margin:20px auto 0;background:white;border-radius:10px;border:0.5px solid var(--border);padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Total pipeline GP</div><div style="font-size:22px;font-weight:600;color:var(--text);margin-top:4px">${fmt(total)}</div></div>
+      <div style="text-align:right"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Total deals</div><div style="font-size:22px;font-weight:600;color:var(--text);margin-top:4px">${totalDeals}</div></div>
+    </div>`
+}
+
+// ── FORECAST ──────────────────────────────────────────────────────
+function renderForecast() {
+  const months = Array.from({length:12},(_,i)=>{
+    const d = new Date(2026,i,1)
+    return {key:`2026-${String(i+1).padStart(2,'0')}`,label:d.toLocaleDateString('en-US',{month:'short',year:'2-digit'})}
+  })
+
+  const gpByMonth = {}; const wonByMonth = {}
+  months.forEach(m=>{ gpByMonth[m.key]=0; wonByMonth[m.key]=0 })
+  deals.forEach(d=>{
+    if(!d.date) return
+    const mp=(d.value*(d.ai_probability||0))/(d.duration||12)
+    const s=new Date(d.date)
+    for(let i=0;i<(d.duration||12);i++){const dt=new Date(s.getFullYear(),s.getMonth()+i,1);const k=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;if(gpByMonth[k]!==undefined)gpByMonth[k]+=mp}
+  })
+  closedDeals.filter(d=>d.closed_outcome==='won').forEach(d=>{
+    if(!d.date) return
+    const mp=d.value/(d.duration||12)
+    const s=new Date(d.date)
+    for(let i=0;i<(d.duration||12);i++){const dt=new Date(s.getFullYear(),s.getMonth()+i,1);const k=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;if(gpByMonth[k]!==undefined){gpByMonth[k]+=mp;wonByMonth[k]+=mp}}
+  })
+
+  const maxV = Math.max(...months.map(m=>Math.max(gpByMonth[m.key]||0,monthTargets[m.key]||0)),1)
+  const totalExp = months.reduce((s,m)=>s+(gpByMonth[m.key]||0),0)
+  const onTrack = months.filter(m=>(gpByMonth[m.key]||0)>=(monthTargets[m.key]||0)).length
+  const gap = annualTarget>0?annualTarget-calcExpected2026():null
+
+  const tInputVal = annualTarget>0?annualTarget.toLocaleString('en-US'):''
+  const mVal = annualTarget>0?fmt(Math.round(annualTarget/12)):'—'
+
+  const fcMetrics = [
+    {label:'12-month expected GP',value:fmt(totalExp),sub:'won + pipeline weighted'},
+    {label:'Annual GP target',value:annualTarget>0?fmt(annualTarget):'—',sub:annualTarget>0?fmt(Math.round(annualTarget/12))+'/month':'not set'},
+    {label:'Months on track',value:annualTarget>0?onTrack+' / 12':'—',sub:'meeting or exceeding target',color:annualTarget===0?'var(--muted)':onTrack>=9?'var(--green)':onTrack>=6?'var(--amber)':'var(--red)'},
+    {label:'Coverage ratio',value:annualTarget>0?Math.round(totalExp/annualTarget*100)+'%':'—',sub:'expected GP vs target',color:annualTarget>0&&totalExp/annualTarget>=1?'var(--green)':'var(--red)'},
+  ].map(m=>`<div class="metric-card" style="flex:1"><div class="metric-label">${m.label}</div><div class="metric-value" style="${m.color?'color:'+m.color:''}">${m.value}</div><div class="metric-sub">${m.sub}</div></div>`).join('')
+
+  const chartBars = months.map(m=>{
+    const gp=gpByMonth[m.key]||0, tgt=monthTargets[m.key]||0
+    const bH=maxV>0?Math.max(2,(gp/maxV)*170):2
+    const tH=maxV>0?(tgt/maxV)*170:0
+    const col=gp>=(tgt||0)&&tgt>0?'var(--green)':tgt>0&&gp>=tgt*0.7?'var(--amber)':'var(--blue)'
+    return `<div class="chart-col">
+      ${tgt>0?`<div class="dashed-line" style="bottom:${tH+20}px"></div>`:''}
+      <div class="chart-bar" style="height:${bH}px;background:${col}"></div>
+      <div class="chart-label" onclick="editMonthTarget('${m.key}')" title="Click to set target">${m.label}</div>
+    </div>`
+  }).join('')
+
+  const monthRows = months.map(m=>{
+    const gp=gpByMonth[m.key]||0, tgt=monthTargets[m.key]||0
+    const p=tgt>0?Math.min(100,Math.round(gp/tgt*100)):0
+    const col=tgt>0?(gp>=tgt?'var(--green)':gp>=tgt*0.7?'var(--amber)':'var(--red)'):'#5a6a7a'
+    return `<div class="month-row">
+      <div style="min-width:52px;font-size:12px;font-weight:600;color:var(--text)">${m.label}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${p}%;background:${col}"></div></div>
+      <div style="min-width:90px;font-size:12px;font-weight:600;color:var(--text);text-align:right">
+        ${fmt(gp)}
+        ${wonByMonth[m.key]>0?`<div style="font-size:10px;color:var(--green);font-weight:500">✓ ${fmt(wonByMonth[m.key])} won</div>`:''}
+      </div>
+      <div style="min-width:90px;font-size:11px;color:var(--muted);text-align:right">${tgt>0?'/ '+fmt(tgt):'—'}</div>
+      <div style="min-width:44px;font-size:11px;font-weight:600;color:${col};text-align:right">${tgt>0?p+'%':''}</div>
+      <button onclick="editMonthTarget('${m.key}')" style="background:none;border:0.5px solid var(--border);border-radius:4px;padding:3px 8px;cursor:pointer;font-size:10px;color:var(--muted)">Edit</button>
+    </div>`
+  }).join('')
+
+  document.getElementById('view-forecast').innerHTML = `
+    <div class="forecast-target-bar">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div>
+          <div class="target-label">Annual GP target</div>
+          <div style="position:relative;display:inline-block">
+            <span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px;color:rgba(255,255,255,0.5)">$</span>
+            <input class="target-input" id="targetInput" type="text" placeholder="e.g. 1,000,000" value="${tInputVal}"
+              oninput="onTargetInput(this.value)"
+              onblur="onTargetBlur(this.value)"
+              onkeydown="if(event.key==='Enter')this.blur()" />
+          </div>
+        </div>
+        <div class="target-divider"></div>
+        <div>
+          <div class="target-label">Monthly</div>
+          <div class="target-monthly">${mVal}</div>
+        </div>
+        <div class="target-divider"></div>
+        <button class="target-reset" onclick="resetDistribution()" ${annualTarget?'':'disabled'}>Reset distribution</button>
+      </div>
+    </div>
+    <div class="forecast-metrics" style="display:flex;gap:12px;margin-bottom:24px">${fcMetrics}</div>
+    <div class="forecast-chart">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div style="font-size:12px;font-weight:600;color:#5a6a7a;text-transform:uppercase;letter-spacing:.05em">Monthly GP forecast vs target</div>
+        <div style="display:flex;gap:16px">
+          <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:2px;background:var(--green);opacity:0.7"></div><span style="font-size:11px;color:var(--muted)">Expected GP</span></div>
+          <div style="display:flex;align-items:center;gap:6px"><div style="width:20px;border-top:2px dashed var(--red)"></div><span style="font-size:11px;color:var(--muted)">Target</span></div>
+        </div>
+      </div>
+      <div class="chart-bars">${chartBars}</div>
+      <div style="margin-top:12px;font-size:11px;color:var(--muted);text-align:center">Click any month label to override its target</div>
+    </div>
+    <div class="month-rows">${monthRows}</div>
+  `
+}
+
+function onTargetInput(val) {
+  const n = parseComma(val)
+  annualTarget = n
+  distributeAnnual(n)
+  // Format with commas live
+  const el = document.getElementById('targetInput')
+  if (el) {
+    const pos = el.selectionStart
+    const raw = val.replace(/,/g,'')
+    if (/^\d*$/.test(raw) && raw !== '') {
+      const formatted = Number(raw).toLocaleString('en-US')
+      el.value = formatted
+      // Restore cursor approximately
+      const diff = formatted.length - val.length
+      el.setSelectionRange(pos + diff, pos + diff)
+    }
+  }
+}
+function onTargetBlur(val) {
+  const n = parseComma(val)
+  annualTarget = n
+  const el = document.getElementById('targetInput')
+  if (el) el.value = n ? n.toLocaleString('en-US') : ''
+  distributeAnnual(n)
+  renderForecast()
+}
+function onTargetFocus(el) {
+  el.value = el.value.replace(/,/g,'')
+}
+function distributeAnnual(n) {
+  if (n>0) { for(let i=1;i<=12;i++) monthTargets[`2026-${String(i).padStart(2,'0')}`]=Math.round(n/12) }
+  else monthTargets={}
+}
+function resetDistribution() { distributeAnnual(annualTarget); renderForecast() }
+function editMonthTarget(key) {
+  const cur = monthTargets[key]||0
+  const val = prompt(`Set GP target for ${key}:`, cur ? fmtComma(cur) : '')
+  if (val===null) return
+  monthTargets[key] = parseComma(val)
+  renderForecast()
+}
+
+// ── CLOSED ────────────────────────────────────────────────────────
+let closedFilter = 'all'
+function renderClosed() {
+  const won = closedDeals.filter(d=>d.closed_outcome==='won')
+  const lost = closedDeals.filter(d=>d.closed_outcome==='lost')
+  const wonVal = won.reduce((s,d)=>s+d.value,0)
+  const filtered = closedDeals.filter(d=>closedFilter==='all'?true:d.closed_outcome===closedFilter)
+
+  // Loss reason breakdown
+  const rc = {}; lost.forEach(d=>{ if(d.loss_reason) rc[d.loss_reason]=(rc[d.loss_reason]||0)+1 })
+  const re = Object.entries(rc).sort((a,b)=>b[1]-a[1])
+
+  let donutHTML = ''
+  if (re.length>0) {
+    const legend = re.map(([r,c])=>{
+      const p = Math.round(c/lost.length*100)
+      const col = REASON_COLORS[r]||'#b4b2a9'
+      return `<div class="legend-item"><div class="legend-dot" style="background:${col}"></div>${r} <strong style="color:${col}">${p}%</strong> (${c})</div>`
+    }).join('')
+    donutHTML = `<div style="background:white;border-radius:10px;border:0.5px solid var(--border);padding:16px 20px;margin-bottom:20px">
+      <div style="font-size:11px;font-weight:600;color:#5a6a7a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px">Loss reason breakdown</div>
+      <div class="donut-wrap">
+        <div style="width:160px;height:160px"><canvas id="donutCanvas"></canvas></div>
+        <div class="donut-legend">${legend}</div>
+      </div>
+    </div>`
+  }
+
+  const rows = filtered.length===0
+    ? '<div style="text-align:center;padding:40px;color:var(--muted);font-size:14px">No closed deals yet.</div>'
+    : filtered.map(d=>`
+      <div class="closed-row" style="border-left-color:${d.closed_outcome==='won'?'var(--green)':'var(--red)'}">
+        <div style="flex:1;min-width:0;overflow:hidden">
+          <span style="font-size:12px;font-weight:600;color:var(--text)">${d.company}</span>
+          <span style="font-size:10px;color:var(--muted);margin-left:8px">${d.title}</span>
+          ${d.loss_notes?`<span style="font-size:10px;color:var(--muted);font-style:italic;margin-left:6px">— ${d.loss_notes}</span>`:''}
+        </div>
+        <div style="font-size:11px;color:var(--muted)">${d.country||''}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${fmt(d.value)}</div>
+        <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${d.closed_outcome==='won'?'#EAF3DE':'#FCEBEB'};color:${d.closed_outcome==='won'?'#27500A':'#A32D2D'}">${d.closed_outcome==='won'?'Won':'Lost'}</span>
+        ${d.loss_reason?`<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#FAEEDA;color:#633806">${d.loss_reason}</span>`:''}
+        <button onclick="openEditClosed(${d.id})" style="background:none;border:0.5px solid var(--border);border-radius:4px;padding:3px 8px;cursor:pointer;font-size:11px;color:var(--muted)">Edit</button>
+      </div>`).join('')
+
+  document.getElementById('view-closed').innerHTML = `
+    <div style="display:flex;gap:12px;margin-bottom:20px">
+      <div class="metric-card" style="flex:1"><div class="metric-label">Closed won</div><div class="metric-value" style="color:var(--green)">${won.length}</div><div class="metric-sub">${fmt(wonVal)} GP</div></div>
+      <div class="metric-card" style="flex:1"><div class="metric-label">Closed lost</div><div class="metric-value" style="color:var(--red)">${lost.length}</div><div class="metric-sub">${closedDeals.length>0?Math.round(lost.length/closedDeals.length*100)+'% loss rate':'—'}</div></div>
+      <div class="metric-card" style="flex:1"><div class="metric-label">Win rate</div><div class="metric-value">${closedDeals.length>0?Math.round(won.length/closedDeals.length*100)+'%':'—'}</div><div class="metric-sub">of all closed deals</div></div>
+    </div>
+    ${donutHTML}
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      ${['all','won','lost'].map(f=>`<button class="filter-btn${closedFilter===f?' active':''}" onclick="setClosedFilter('${f}')">${f==='all'?'All':f==='won'?'Won':'Lost'}</button>`).join('')}
+    </div>
+    <div class="closed-list">${rows}</div>
+  `
+
+  // Render donut
+  if (re.length>0) {
+    setTimeout(()=>{
+      const canvas = document.getElementById('donutCanvas')
+      if (!canvas) return
+      if (donutChart) donutChart.destroy()
+      donutChart = new Chart(canvas, {
+        type:'doughnut',
+        data:{labels:re.map(([r])=>r),datasets:[{data:re.map(([,c])=>c),backgroundColor:re.map(([r])=>REASON_COLORS[r]||'#b4b2a9'),borderWidth:0}]},
+        options:{responsive:true,maintainAspectRatio:true,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed} (${Math.round(ctx.parsed/lost.length*100)}%)`}}}}
+      })
+    },50)
+  }
+}
+
+function setClosedFilter(f) { closedFilter=f; renderClosed() }
+
+// ── LOSS MODAL ────────────────────────────────────────────────────
+function openLossModal(id) {
+  lossTarget = id
+  const d = deals.find(d=>d.id===id)
+  document.getElementById('lossModalSub').textContent = d ? d.company+' — '+d.title : ''
+  document.getElementById('lossModal').style.display = 'block'
+}
+function closeLossModal() { document.getElementById('lossModal').style.display='none'; lossTarget=null }
+function confirmLoss() {
+  if (!lossTarget) return
+  const d = deals.find(d=>d.id===lossTarget)
+  if (!d) return
+  d.stage = 'Closed Lost'
+  d.closed_outcome = 'lost'
+  d.loss_reason = document.getElementById('lossReason').value
+  d.loss_notes = document.getElementById('lossNotes').value
+  closedDeals.push({...d})
+  deals = deals.filter(x=>x.id!==lossTarget)
+  closeLossModal()
+  runAI()
+}
+
+// ── DEAL FORM ─────────────────────────────────────────────────────
+function openAdd() {
+  editingDealId = null
+  document.getElementById('panelTitle').textContent = 'Add new deal'
+  document.getElementById('panelSaveBtn').textContent = 'Save deal'
+  document.getElementById('panelBody').innerHTML = dealFormHTML(null)
+  document.getElementById('dealPanel').style.display = 'block'
+}
+function openEdit(id) {
+  editingDealId = id
+  const d = deals.find(d=>d.id===id)
+  document.getElementById('panelTitle').textContent = 'Edit deal'
+  document.getElementById('panelSaveBtn').textContent = 'Save changes'
+  document.getElementById('panelBody').innerHTML = dealFormHTML(d)
+  document.getElementById('dealPanel').style.display = 'block'
+}
+function openEditClosed(id) {
+  editingDealId = id
+  const d = closedDeals.find(d=>d.id===id)
+  document.getElementById('panelTitle').textContent = 'Edit deal'
+  document.getElementById('panelSaveBtn').textContent = 'Save changes'
+  document.getElementById('panelBody').innerHTML = dealFormHTML(d, true)
+  document.getElementById('dealPanel').style.display = 'block'
+}
+function closePanel() { document.getElementById('dealPanel').style.display='none'; editingDealId=null }
+
+function dealFormHTML(d, isClosed=false) {
+  const sel = (opts, val) => opts.map(o=>`<option${o===val?' selected':''}>${o}</option>`).join('')
+  const lossSection = (d?.stage==='Closed Lost'||isClosed&&d?.closed_outcome==='lost') ? `
+    <div class="fsection" style="color:#A32D2D;border-top:0.5px solid #FCEBEB;padding-top:16px">Loss reason</div>
+    <div class="fgroup"><label class="flabel">Reason</label><select class="finput" id="f_lossreason">${sel(LOSS_REASONS,d?.loss_reason||'Competitor')}</select></div>
+    <div class="fgroup"><label class="flabel">Notes</label><textarea class="finput" id="f_lossnotes" placeholder="e.g. Lost to competitor on rate">${d?.loss_notes||''}</textarea></div>` : ''
+  return `
+    <div class="fsection">Contact</div>
+    <div class="fgroup"><label class="flabel">Full name *</label><input class="finput" id="f_name" value="${d?.contact||''}" placeholder="Maria Lopez" /></div>
+    <div class="fgroup"><label class="flabel">Company *</label><input class="finput" id="f_company" value="${d?.company||''}" placeholder="Acme Logistics" /></div>
+    <div class="fgroup"><label class="flabel">Email</label><input class="finput" id="f_email" value="${d?.email||''}" placeholder="maria@acme.com" /></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fgroup"><label class="flabel">Country</label><select class="finput" id="f_country"><option value="">Select...</option>${sel(COUNTRIES,d?.country||'')}</select></div>
+      <div class="fgroup"><label class="flabel">Industry</label><select class="finput" id="f_industry">${sel(INDUSTRIES,d?.industry||'Logistics')}</select></div>
+    </div>
+    <div class="fsection">Deal</div>
+    <div class="fgroup"><label class="flabel">Deal title *</label><input class="finput" id="f_title" value="${d?.title||''}" placeholder="Acme — FCL Mexico Lane" /></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px">
+      <div class="fgroup"><label class="flabel">GP (gross profit) *</label><input class="finput" id="f_value" type="text" value="${d?.value?fmtComma(d.value):''}" placeholder="50,000" onblur="this.value=this.value?parseComma(this.value).toLocaleString('en-US'):''" /></div>
+      <div class="fgroup"><label class="flabel">Currency</label><select class="finput" id="f_currency">${sel(CURRENCIES,d?.currency||'USD')}</select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fgroup"><label class="flabel">Stage</label><select class="finput" id="f_stage">${sel(ALL_STAGES,d?.stage||'Lead')}</select></div>
+      <div class="fgroup"><label class="flabel">Duration (months)</label><input class="finput" id="f_duration" type="number" min="1" max="120" value="${d?.duration||12}" /></div>
+    </div>
+    <div class="fgroup"><label class="flabel">Expected start date${!isClosed?' *':''}</label><input class="finput" id="f_date" type="date" value="${d?.date||''}" /><div style="font-size:10px;color:var(--muted);margin-top:4px">When the service starts — required for forecast</div></div>
+    <div class="fgroup"><label class="flabel">Brought by</label><input class="finput" id="f_brought" value="${d?.brought_by||demoUser}" /></div>
+    ${lossSection}
+    <div id="panelError"></div>
+  `
+}
+
+function savePanel() {
+  const g = id => document.getElementById(id)
+  const name = g('f_name')?.value.trim()
+  const company = g('f_company')?.value.trim()
+  const title = g('f_title')?.value.trim()
+  const valueStr = g('f_value')?.value
+  const value = parseComma(valueStr)
+  const date = g('f_date')?.value
+  const stage = g('f_stage')?.value
+  const isClosed = stage==='Closed Won'||stage==='Closed Lost'
+
+  if (!name||!company||!title||!value) { g('panelError').innerHTML='<div class="error-msg">Please fill in: name, company, title, and GP value.</div>'; return }
+  if (!isClosed && !date) { g('panelError').innerHTML='<div class="error-msg">Expected start date is required for the forecast.</div>'; return }
+
+  const payload = {
+    contact:name, company, email:g('f_email')?.value||'',
+    country:g('f_country')?.value||'', industry:g('f_industry')?.value||'Logistics',
+    title, value, currency:g('f_currency')?.value||'USD',
+    stage, duration:Number(g('f_duration')?.value)||12,
+    date:date||null, brought_by:g('f_brought')?.value||demoUser,
+    calls:0, emails:0, meetings:0, proposal:false,
+    loss_reason:stage==='Closed Lost'?(g('f_lossreason')?.value||null):null,
+    loss_notes:stage==='Closed Lost'?(g('f_lossnotes')?.value||''):null,
+    closed_outcome:stage==='Closed Won'?'won':stage==='Closed Lost'?'lost':null
+  }
+
+  if (editingDealId) {
+    // Check if in active or closed
+    const ai = deals.findIndex(d=>d.id===editingDealId)
+    const ci = closedDeals.findIndex(d=>d.id===editingDealId)
+    if (ai>=0) {
+      if (isClosed) {
+        deals.splice(ai,1)
+        closedDeals.push({...payload, id:editingDealId})
+      } else {
+        Object.assign(deals[ai], payload)
+      }
+    } else if (ci>=0) {
+      Object.assign(closedDeals[ci], payload)
+    }
+  } else {
+    const newDeal = {...payload, id:nextId++}
+    if (isClosed) closedDeals.push(newDeal)
+    else deals.push(newDeal)
+  }
+
+  closePanel()
+  runAI()
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────
+document.getElementById('nameInput').addEventListener('keydown', e => { if(e.key==='Enter') startDemo() })
+</script>
+</body>
+</html>
