@@ -170,6 +170,43 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .progress-bar { flex: 1; background: #f0f4f8; border-radius: 4px; height: 6px; }
 .progress-fill { height: 6px; border-radius: 4px; transition: width 0.5s; }
 
+/* TEAM */
+.team-target-bar { background: var(--primary); border-radius: 10px; padding: 14px 20px; margin-bottom: 16px; }
+.team-target-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.team-target-title { font-size: 11px; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.06em; }
+.team-target-value { font-size: 15px; font-weight: 600; color: white; }
+.team-progress-track { background: rgba(255,255,255,0.12); border-radius: 4px; height: 6px; width: 100%; }
+.team-progress-fill { height: 6px; border-radius: 4px; background: var(--green); transition: width 0.5s; }
+.team-progress-labels { display: flex; justify-content: space-between; margin-top: 6px; }
+.team-progress-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+.team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+.rep-card { background: white; border-radius: 10px; border: 0.5px solid var(--border); padding: 16px; }
+.rep-rank { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.rep-rank.gold { color: #BA7517; }
+.rep-rank.silver { color: #888780; }
+.rep-rank.bronze { color: #996644; }
+.rep-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.rep-lane { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+.rep-gp { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.rep-gp-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.rep-bar-track { background: #f0f4f8; border-radius: 4px; height: 5px; margin-bottom: 10px; }
+.rep-bar-fill { height: 5px; border-radius: 4px; background: var(--green); }
+.rep-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; border-top: 0.5px solid var(--border); padding-top: 10px; }
+.rep-stat { }
+.rep-stat-val { font-size: 13px; font-weight: 600; color: var(--text); }
+.rep-stat-lbl { font-size: 10px; color: var(--muted); }
+.team-leaderboard { background: white; border-radius: 10px; border: 0.5px solid var(--border); padding: 16px 20px; }
+.lb-header { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+.lb-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+.lb-row:last-child { border-bottom: none; }
+.lb-rank-num { font-size: 16px; font-weight: 700; min-width: 28px; }
+.lb-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+.lb-lane { font-size: 11px; color: var(--muted); }
+.lb-gp { font-size: 14px; font-weight: 700; color: var(--text); min-width: 90px; text-align: right; }
+.lb-pct { font-size: 11px; color: var(--muted); min-width: 50px; text-align: right; }
+.lb-bar-wrap { flex: 2; background: #f0f4f8; border-radius: 4px; height: 5px; }
+.lb-bar-fill { height: 5px; border-radius: 4px; background: var(--green); }
+
 .error-msg { background: #FCEBEB; color: #A32D2D; padding: 10px 12px; border-radius: 6px; font-size: 12px; margin-top: 8px; }
 .success-msg { background: #EAF3DE; color: #27500A; padding: 10px 12px; border-radius: 6px; font-size: 12px; margin-top: 8px; }
 .loading { text-align: center; padding: 60px; color: var(--muted); font-size: 14px; }
@@ -214,6 +251,7 @@ textarea.finput { resize: none; height: 64px; }
     <div class="nav">
       <button onclick="setView('pipeline')" id="nav-pipeline" class="active">Pipeline</button>
       <button onclick="setView('forecast')" id="nav-forecast">Forecast</button>
+      <button onclick="setView('team')" id="nav-team">Team</button>
       <button onclick="setView('priority')" id="nav-priority">Priority</button>
       <button onclick="setView('closed')" id="nav-closed">Closed</button>
     </div>
@@ -234,6 +272,7 @@ textarea.finput { resize: none; height: 64px; }
     <div id="view-priority" style="display:none"></div>
 
     <div id="view-forecast" style="display:none"></div>
+    <div id="view-team" style="display:none"></div>
     <div id="view-closed" style="display:none"></div>
   </div>
 </div>
@@ -441,7 +480,7 @@ function setView(v) {
   currentView = v
   document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'))
   document.getElementById('nav-'+v)?.classList.add('active')
-  ;['pipeline','priority','forecast','closed'].forEach(name => {
+  ;['pipeline','priority','forecast','closed','team'].forEach(name => {
     document.getElementById('view-'+name).style.display = name===v ? '' : 'none'
   })
   renderView(v)
@@ -458,6 +497,7 @@ function renderView(v) {
   else if (v==='forecast') renderForecast()
   else if (v==='priority') renderPriority()
   else if (v==='closed') renderClosed()
+  else if (v==='team') renderTeam()
 }
 
 // ── METRICS ───────────────────────────────────────────────────────
@@ -1051,6 +1091,159 @@ function savePanel() {
 
   closePanel()
   runAI()
+}
+
+// ── TEAM ──────────────────────────────────────────────────────────
+const TEAM_TARGET = 1200000
+
+const TEAM_REPS = [
+  {
+    name: 'Diego Salazar', lane: 'Mexico & Central America',
+    deals: [
+      {company:'TechParts LATAM',title:'Auto Components Export',value:120000,stage:'Proposal',date:'2026-05-01',duration:24},
+      {company:'Quimex Industrial',title:'Hazmat Export Lane',value:145000,stage:'Qualified',date:'2026-08-01',duration:18},
+      {company:'AutoMex Parts',title:'Spare Parts Distribution',value:110000,stage:'Negotiation',date:'2026-04-15',duration:18},
+      {company:'TropicFresh CR',title:'Pineapple Export Lane',value:52000,stage:'Qualified',date:'2026-05-15',duration:6},
+      {company:'CosmeticaCR',title:'Express Export Lane',value:27000,stage:'Negotiation',date:'2026-04-15',duration:6},
+    ],
+    won: [{value:105000,date:'2026-03-15',duration:18},{value:88000,date:'2026-03-01',duration:12}]
+  },
+  {
+    name: 'Valentina Mora', lane: 'Colombia & Andean Region',
+    deals: [
+      {company:'Andean Fresh Foods',title:'Reefer Export Lane',value:84000,stage:'Negotiation',date:'2026-04-01',duration:12},
+      {company:'PharmaAndes',title:'Pharma Consolidation',value:91000,stage:'Qualified',date:'2026-05-01',duration:12},
+      {company:'ColTex Apparel',title:'Garments Export Lane',value:33000,stage:'Lead',date:'2026-07-15',duration:6},
+      {company:'ColFlower Export',title:'Perishables Export Lane',value:47000,stage:'Proposal',date:'2026-06-01',duration:6},
+    ],
+    won: [{value:72000,date:'2026-02-01',duration:12}]
+  },
+  {
+    name: 'Rafael Campos', lane: 'Brazil & Southern Cone',
+    deals: [
+      {company:'BioFarm Brasil',title:'FCL Export Lane',value:56000,stage:'Qualified',date:'2026-06-01',duration:12},
+      {company:'BrazilNuts Co',title:'Bulk Commodity Export',value:48000,stage:'Lead',date:'2026-08-15',duration:6},
+      {company:'Vino del Sur',title:'Wine Export Lane',value:67000,stage:'Proposal',date:'2026-06-01',duration:12},
+      {company:'ElectroArg',title:'Electronics Export',value:78000,stage:'Lead',date:'2026-09-01',duration:12},
+      {company:'ChileFrut SA',title:'Stone Fruit Export Lane',value:74000,stage:'Negotiation',date:'2026-04-01',duration:12},
+    ],
+    won: [{value:61000,date:'2026-02-15',duration:12}]
+  },
+  {
+    name: 'Camila Ortega', lane: 'Peru, Ecuador & Guatemala',
+    deals: [
+      {company:'Lima Exports SA',title:'LCL Consolidation',value:38000,stage:'Lead',date:'2026-07-01',duration:6},
+      {company:'AgriPeru Export',title:'Reefer Export Lane',value:62000,stage:'Proposal',date:'2026-06-15',duration:12},
+      {company:'Ecuaflor',title:'Fresh Flowers Export',value:39000,stage:'Proposal',date:'2026-07-01',duration:12},
+      {company:'GuateFresh SA',title:'Perishables Export Lane',value:44000,stage:'Negotiation',date:'2026-04-01',duration:6},
+      {company:'GuateCafe Export',title:'Green Coffee Export',value:58000,stage:'Qualified',date:'2026-06-01',duration:12},
+      {company:'BoliTex Fabrics',title:'Textile Export Consolidation',value:29000,stage:'Lead',date:'2026-09-15',duration:6},
+    ],
+    won: []
+  }
+]
+
+function repGP2026(rep) {
+  const stageW = {Lead:0.1,Qualified:0.3,Proposal:0.6,Negotiation:0.8}
+  let total = 0
+  rep.deals.forEach(d => {
+    const prob = stageW[d.stage]||0.1
+    const monthly = (d.value * prob) / d.duration
+    const start = new Date(d.date)
+    for (let i=0;i<d.duration;i++) {
+      const dt = new Date(start.getFullYear(), start.getMonth()+i, 1)
+      if (dt.getFullYear()===2026) total += monthly
+    }
+  })
+  rep.won.forEach(d => {
+    const monthly = d.value / d.duration
+    const start = new Date(d.date)
+    for (let i=0;i<d.duration;i++) {
+      const dt = new Date(start.getFullYear(), start.getMonth()+i, 1)
+      if (dt.getFullYear()===2026) total += monthly
+    }
+  })
+  return Math.round(total)
+}
+
+function renderTeam() {
+  const el = document.getElementById('view-team')
+  const rankColors = ['gold','silver','bronze','']
+  const rankLabels = ['🥇 #1 — Top performer','🥈 #2','🥉 #3','#4']
+
+  // Compute GP per rep and sort for leaderboard
+  const repsWithGP = TEAM_REPS.map(r => ({...r, gp2026: repGP2026(r), pipeline: r.deals.reduce((s,d)=>s+d.value,0), dealCount: r.deals.length}))
+  const sorted = [...repsWithGP].sort((a,b) => b.gp2026 - a.gp2026)
+  const totalGP = sorted.reduce((s,r) => s+r.gp2026, 0)
+  const maxGP = sorted[0].gp2026
+  const pctOfTarget = Math.min(1, totalGP / TEAM_TARGET)
+
+  // Rep cards (sorted by GP)
+  const cards = sorted.map((r, i) => {
+    const repPct = maxGP > 0 ? (r.gp2026 / maxGP) : 0
+    const targetShare = TEAM_TARGET / 4
+    const vsTarget = r.gp2026 / targetShare
+    const barColor = vsTarget >= 0.8 ? 'var(--green)' : vsTarget >= 0.5 ? 'var(--amber)' : 'var(--red)'
+    return `
+    <div class="rep-card">
+      <div class="rep-rank ${rankColors[i]}">${rankLabels[i]}</div>
+      <div class="rep-name">${r.name}</div>
+      <div class="rep-lane">${r.lane}</div>
+      <div class="rep-gp">${fmt(r.gp2026)}</div>
+      <div class="rep-gp-label">2026 GP forecast</div>
+      <div class="rep-bar-track"><div class="rep-bar-fill" style="width:${Math.round(repPct*100)}%;background:${barColor}"></div></div>
+      <div class="rep-stats">
+        <div class="rep-stat"><div class="rep-stat-val">${r.dealCount}</div><div class="rep-stat-lbl">Active deals</div></div>
+        <div class="rep-stat"><div class="rep-stat-val">${fmt(r.pipeline)}</div><div class="rep-stat-lbl">Pipeline GP</div></div>
+        <div class="rep-stat"><div class="rep-stat-val">${r.won.length}</div><div class="rep-stat-lbl">Closed won</div></div>
+        <div class="rep-stat"><div class="rep-stat-val">${totalGP>0?Math.round((r.gp2026/totalGP)*100):'0'}%</div><div class="rep-stat-lbl">Team share</div></div>
+      </div>
+    </div>`
+  }).join('')
+
+  // Leaderboard rows
+  const lbRows = sorted.map((r, i) => {
+    const pctOfMax = maxGP > 0 ? (r.gp2026 / maxGP) : 0
+    const teamShare = totalGP > 0 ? Math.round((r.gp2026/totalGP)*100) : 0
+    const medals = ['🥇','🥈','🥉','4️⃣']
+    return `
+    <div class="lb-row">
+      <div class="lb-rank-num">${medals[i]}</div>
+      <div style="flex:2">
+        <div class="lb-name">${r.name}</div>
+        <div class="lb-lane">${r.lane}</div>
+      </div>
+      <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${Math.round(pctOfMax*100)}%"></div></div>
+      <div class="lb-gp">${fmt(r.gp2026)}</div>
+      <div class="lb-pct">${teamShare}% of team</div>
+    </div>`
+  }).join('')
+
+  el.innerHTML = `
+    <div class="team-target-bar">
+      <div class="team-target-header">
+        <div>
+          <div class="team-target-title">Team GP target 2026</div>
+          <div style="font-size:20px;font-weight:700;color:white;margin-top:4px">${fmt(TEAM_TARGET)}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="team-target-title">Team forecast vs target</div>
+          <div style="font-size:20px;font-weight:700;color:${pctOfTarget>=1?'var(--green)':'#FAEEDA'};margin-top:4px">${fmt(totalGP)} <span style="font-size:13px;font-weight:400;color:rgba(255,255,255,0.5)">${Math.round(pctOfTarget*100)}%</span></div>
+        </div>
+      </div>
+      <div class="team-progress-track"><div class="team-progress-fill" style="width:${Math.round(pctOfTarget*100)}%"></div></div>
+      <div class="team-progress-labels">
+        <div class="team-progress-label">$0</div>
+        <div class="team-progress-label">${fmt(TEAM_TARGET/2)}</div>
+        <div class="team-progress-label">${fmt(TEAM_TARGET)}</div>
+      </div>
+    </div>
+    <div class="team-grid">${cards}</div>
+    <div class="team-leaderboard">
+      <div class="lb-header">Leaderboard — ranked by 2026 GP forecast</div>
+      ${lbRows}
+    </div>
+  `
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────
