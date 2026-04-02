@@ -170,49 +170,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .progress-bar { flex: 1; background: #f0f4f8; border-radius: 4px; height: 6px; }
 .progress-fill { height: 6px; border-radius: 4px; transition: width 0.5s; }
 
-/* TEAM */
-.team-target-bar { background: var(--primary); border-radius: 10px; padding: 14px 20px; margin-bottom: 16px; }
-.team-target-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.team-target-title { font-size: 11px; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.06em; }
-.team-target-value { font-size: 15px; font-weight: 600; color: white; }
-.team-progress-track { background: rgba(255,255,255,0.12); border-radius: 4px; height: 6px; width: 100%; }
-.team-progress-fill { height: 6px; border-radius: 4px; background: var(--green); transition: width 0.5s; }
-.team-progress-labels { display: flex; justify-content: space-between; margin-top: 6px; }
-.team-progress-label { font-size: 11px; color: rgba(255,255,255,0.5); }
-.team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
-.rep-card { background: white; border-radius: 10px; border: 0.5px solid var(--border); padding: 16px; }
-.rep-rank { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
-.rep-rank.gold { color: #BA7517; }
-.rep-rank.silver { color: #888780; }
-.rep-rank.bronze { color: #996644; }
-.rep-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-.rep-lane { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
-.rep-gp { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-.rep-gp-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
-.rep-bar-track { background: #f0f4f8; border-radius: 4px; height: 5px; margin-bottom: 10px; }
-.rep-bar-fill { height: 5px; border-radius: 4px; background: var(--green); }
-.rep-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; border-top: 0.5px solid var(--border); padding-top: 10px; }
-.rep-stat { }
-.rep-stat-val { font-size: 13px; font-weight: 600; color: var(--text); }
-.rep-stat-lbl { font-size: 10px; color: var(--muted); }
-.team-leaderboard { background: white; border-radius: 10px; border: 0.5px solid var(--border); padding: 16px 20px; }
-.lb-header { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
-.lb-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
-.lb-row:last-child { border-bottom: none; }
-.lb-rank-num { font-size: 16px; font-weight: 700; min-width: 28px; }
-.lb-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
-.lb-lane { font-size: 11px; color: var(--muted); }
-.lb-gp { font-size: 14px; font-weight: 700; color: var(--text); min-width: 90px; text-align: right; }
-.lb-pct { font-size: 11px; color: var(--muted); min-width: 50px; text-align: right; }
-.lb-bar-wrap { flex: 2; background: #f0f4f8; border-radius: 4px; height: 5px; }
-.lb-bar-fill { height: 5px; border-radius: 4px; background: var(--green); }
-
 .error-msg { background: #FCEBEB; color: #A32D2D; padding: 10px 12px; border-radius: 6px; font-size: 12px; margin-top: 8px; }
 .success-msg { background: #EAF3DE; color: #27500A; padding: 10px 12px; border-radius: 6px; font-size: 12px; margin-top: 8px; }
 .loading { text-align: center; padding: 60px; color: var(--muted); font-size: 14px; }
 
 select.finput { cursor: pointer; }
 textarea.finput { resize: none; height: 64px; }
+.detail-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 380px; background: white; z-index: 100; box-shadow: -4px 0 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.detail-field { background: #f4f6f8; border-radius: 8px; padding: 10px 12px; }
+.detail-field-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+.detail-field-val { font-size: 13px; font-weight: 600; color: var(--text); }
 </style>
 </head>
 <body>
@@ -251,7 +219,6 @@ textarea.finput { resize: none; height: 64px; }
     <div class="nav">
       <button onclick="setView('pipeline')" id="nav-pipeline" class="active">Pipeline</button>
       <button onclick="setView('forecast')" id="nav-forecast">Forecast</button>
-      <button onclick="setView('team')" id="nav-team">Team</button>
       <button onclick="setView('priority')" id="nav-priority">Priority</button>
       <button onclick="setView('closed')" id="nav-closed">Closed</button>
     </div>
@@ -272,7 +239,6 @@ textarea.finput { resize: none; height: 64px; }
     <div id="view-priority" style="display:none"></div>
 
     <div id="view-forecast" style="display:none"></div>
-    <div id="view-team" style="display:none"></div>
     <div id="view-closed" style="display:none"></div>
   </div>
 </div>
@@ -345,7 +311,6 @@ let lossTarget = null
 let annualTarget = 1000000
 let monthTargets = (function(){const t={};for(let i=1;i<=12;i++)t['2026-'+String(i).padStart(2,'0')]=Math.round(1000000/12);return t})()
 let donutChart = null
-let repTargets = {} // keyed by rep name, value = annual GP target
 
 const SEED = [
   {contact:'Carlos Mendoza',company:'Andean Fresh Foods',country:'Colombia',industry:'Reefer',title:'Andean Fresh — Reefer Export Lane',value:84000,stage:'Negotiation',duration:12,date:'2026-04-01'},
@@ -459,7 +424,7 @@ function resetPipeline() {
 
 function switchUser() {
   deals = []; closedDeals = []; nextId = 1000
-  annualTarget = 0; monthTargets = {}; repTargets = {}
+  annualTarget = 0; monthTargets = {}
   document.getElementById('app').style.display = 'none'
   document.getElementById('welcome').style.display = 'flex'
   document.getElementById('nameInput').value = ''
@@ -481,7 +446,7 @@ function setView(v) {
   currentView = v
   document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'))
   document.getElementById('nav-'+v)?.classList.add('active')
-  ;['pipeline','priority','forecast','closed','team'].forEach(name => {
+  ;['pipeline','priority','forecast','closed'].forEach(name => {
     document.getElementById('view-'+name).style.display = name===v ? '' : 'none'
   })
   renderView(v)
@@ -498,7 +463,6 @@ function renderView(v) {
   else if (v==='forecast') renderForecast()
   else if (v==='priority') renderPriority()
   else if (v==='closed') renderClosed()
-  else if (v==='team') renderTeam()
 }
 
 // ── METRICS ───────────────────────────────────────────────────────
@@ -551,29 +515,77 @@ function calcExpected2026() {
 }
 
 // ── PIPELINE ──────────────────────────────────────────────────────
+let pipelineQFilter = 'all'
+let pipelineSelectedId = null
+let pipelineDetailId = null
+
+function getQuarter(dateStr) {
+  if (!dateStr) return null
+  const m = new Date(dateStr).getMonth() + 1
+  if (m <= 3) return 'q1'
+  if (m <= 6) return 'q2'
+  if (m <= 9) return 'q3'
+  return 'q4'
+}
+
 function renderPipeline() {
   const el = document.getElementById('view-pipeline')
-  // Bar chart
-  const sorted = [...deals].sort((a,b)=>b.value-a.value).slice(0,15)
-  const maxV = Math.max(...sorted.map(d=>d.value),1)
-  const bars = sorted.map(d=>{
+  const allSorted = [...deals].sort((a,b)=>b.value-a.value).slice(0,20)
+  const maxV = Math.max(...allSorted.map(d=>d.value),1)
+  const fmtGP = n => n>=1000000?(n/1000000).toFixed(1)+'M':n>=1000?Math.round(n/1000)+'K':String(n)
+  const quarters = [
+    {key:'q1',label:'Q1',range:'Jan–Mar'},
+    {key:'q2',label:'Q2',range:'Apr–Jun'},
+    {key:'q3',label:'Q3',range:'Jul–Sep'},
+    {key:'q4',label:'Q4',range:'Oct–Dec'},
+  ]
+  const qGP = q => deals.filter(d=>getQuarter(d.date)===q).reduce((s,d)=>s+d.value,0)
+  const qCount = q => deals.filter(d=>getQuarter(d.date)===q).length
+
+  const pills = quarters.map(q => {
+    const active = pipelineQFilter === q.key
+    return `<div onclick="toggleQFilter('${q.key}')" style="padding:3px 8px;border-radius:20px;cursor:pointer;background:${active?'var(--primary)':'#f0f4f8'};border:0.5px solid ${active?'var(--primary)':'var(--border)'};display:flex;flex-direction:column;align-items:center;min-width:42px">
+      <span style="font-size:10px;font-weight:600;color:${active?'white':'#5a6a7a'};line-height:1.4">${q.label}</span>
+      <span style="font-size:8px;color:${active?'rgba(255,255,255,0.6)':'var(--muted)'};line-height:1.2">$${fmtGP(qGP(q.key))} · ${qCount(q.key)}</span>
+    </div>`
+  }).join('')
+
+  const clearBtn = pipelineSelectedId
+    ? `<button onclick="clearBarFilter()" style="font-size:10px;color:var(--blue);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">✕ Clear</button>` : ''
+
+  const bars = allSorted.map(d => {
+    const inQ = pipelineQFilter==='all' || getQuarter(d.date)===pipelineQFilter
+    const inSel = !pipelineSelectedId || pipelineSelectedId===d.id
+    const opacity = (inQ && inSel) ? 1 : 0.12
+    const isSelected = pipelineSelectedId===d.id
     const h = Math.max(8,(d.value/maxV)*140)
     const col = STAGE_COLORS[d.stage]||'#b4b2a9'
-    return `<div class="pipeline-bar-col">
+    return `<div class="pipeline-bar-col" onclick="selectBar(${d.id})" style="cursor:pointer;opacity:${opacity};transition:opacity .2s">
       <div style="font-size:10px;color:var(--text);font-weight:600">${d.value>=1000?Math.round(d.value/1000)+'K':d.value}</div>
-      <div style="width:100%;height:${h}px;background:${col};border-radius:4px 4px 0 0;opacity:0.85" title="${d.title}"></div>
+      <div style="width:100%;height:${h}px;background:${col};border-radius:4px 4px 0 0;opacity:0.85;${isSelected?'outline:2px solid var(--primary);outline-offset:1px':''}" title="${d.title}"></div>
       <div style="font-size:9px;color:var(--muted);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:52px">${d.company.split(' ')[0]}</div>
     </div>`
   }).join('')
+
   const legend = Object.entries(STAGE_COLORS).map(([s,c])=>`
     <div style="display:flex;align-items:center;gap:4px">
       <div style="width:8px;height:8px;border-radius:2px;background:${c}"></div>
       <span style="font-size:11px;color:var(--muted)">${s}</span>
     </div>`).join('')
 
-  // Kanban
+  const hint = pipelineSelectedId
+    ? `<span style="margin-left:auto;font-size:10px;color:var(--muted);font-style:italic">1 deal selected — click bar or × to clear</span>`
+    : pipelineQFilter!=='all'
+      ? `<span style="margin-left:auto;font-size:10px;color:var(--muted);font-style:italic">Showing ${pipelineQFilter.toUpperCase()} — click again to clear</span>` : ''
+
+  const kanbanDeals = deals.filter(d => {
+    const inQ = pipelineQFilter==='all' || getQuarter(d.date)===pipelineQFilter
+    const inSel = !pipelineSelectedId || pipelineSelectedId===d.id
+    return inQ && inSel
+  })
+
   const kanban = STAGES.map(stage=>{
-    const sd = deals.filter(d=>d.stage===stage)
+    const sd = kanbanDeals.filter(d=>d.stage===stage)
     const total = sd.reduce((s,d)=>s+d.value,0)
     const cards = sd.length===0
       ? `<div style="font-size:11px;color:#b4b2a9;padding:8px 0;text-align:center">No deals</div>`
@@ -588,19 +600,97 @@ function renderPipeline() {
   }).join('')
 
   el.innerHTML = `
-    <div class="pipeline-chart-wrap">
-      <div style="font-size:12px;font-weight:600;color:#5a6a7a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:16px">Pipeline by GP</div>
+    <div class="pipeline-chart-wrap" style="padding:14px 18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;font-weight:600;color:#5a6a7a;text-transform:uppercase;letter-spacing:.05em">Pipeline by GP</span>
+          ${clearBtn}
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <span style="font-size:10px;color:var(--muted);margin-right:3px">Starting Q:</span>
+          ${pills}
+        </div>
+      </div>
       <div class="pipeline-bars">${bars}</div>
-      <div style="display:flex;gap:16px;margin-top:12px;justify-content:center">${legend}</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-top:8px">${legend}${hint}</div>
     </div>
     <div class="pipeline" style="max-width:1200px;margin:0 auto">${kanban}</div>
+    ${renderDetailPanel()}
   `
+}
+
+function toggleQFilter(key) {
+  pipelineQFilter = pipelineQFilter===key ? 'all' : key
+  renderPipeline()
+}
+
+function selectBar(id) {
+  pipelineSelectedId = pipelineSelectedId===id ? null : id
+  renderPipeline()
+}
+
+function clearBarFilter() {
+  pipelineSelectedId = null
+  renderPipeline()
+}
+
+function openDetailPanel(id) {
+  pipelineDetailId = id
+  renderPipeline()
+}
+
+function closeDetailPanel() {
+  pipelineDetailId = null
+  renderPipeline()
+}
+
+function renderDetailPanel() {
+  if (!pipelineDetailId) return ''
+  const d = deals.find(d=>d.id===pipelineDetailId)
+  if (!d) return ''
+  const fields = [
+    ['GP Value', fmt(d.value)],
+    ['Stage', d.stage],
+    ['Country', d.country||'—'],
+    ['Industry', d.industry||'—'],
+    ['Win probability', pct(d.ai_probability)],
+    ['Lead score', (d.lead_score||0).toFixed(1)],
+    ['Start date', d.date ? new Date(d.date).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '—'],
+    ['Duration', (d.duration||12)+' months'],
+  ].map(([label,val])=>`<div class="detail-field"><div class="detail-field-lbl">${label}</div><div class="detail-field-val">${val}</div></div>`).join('')
+
+  const acts = [['📞','Calls',d.calls||0],['✉','Emails',d.emails||0],['🤝','Meetings',d.meetings||0],['📄','Proposal',d.proposal?1:0]]
+    .map(([icon,label,count])=>`<div style="flex:1;background:#f4f6f8;border-radius:8px;padding:10px 8px;text-align:center"><div style="font-size:16px">${icon}</div><div style="font-size:14px;font-weight:600;color:var(--text);margin-top:2px">${count}</div><div style="font-size:9px;color:var(--muted)">${label}</div></div>`).join('')
+
+  return `
+    <div class="overlay" onclick="closeDetailPanel()"></div>
+    <div class="detail-panel">
+      <div class="panel-header">
+        <div>
+          <div style="font-size:16px;font-weight:600;color:var(--text)">${d.company}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${d.title}</div>
+        </div>
+        <button onclick="closeDetailPanel()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--muted)">×</button>
+      </div>
+      <div class="panel-body">
+        <div class="detail-grid">${fields}</div>
+        <div style="border-top:0.5px solid var(--border);padding-top:16px;margin-bottom:16px">
+          <div style="font-size:11px;font-weight:600;color:#5a6a7a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Activity</div>
+          <div style="display:flex;gap:8px">${acts}</div>
+        </div>
+        ${d.brought_by?`<div style="font-size:12px;color:var(--muted)">Brought by <strong>${d.brought_by}</strong></div>`:''}
+      </div>
+      <div class="panel-footer">
+        <button class="btn-save" onclick="closeDetailPanel();openEdit(${d.id})">Edit deal</button>
+      </div>
+    </div>`
 }
 
 function dealCardHTML(d) {
   const b = badgeClass(d.lead_score||0)
   const p = priorityClass(d.lead_score||0)
   const sw = Math.min(100,d.lead_score||0)+'%'
+  const isHighlighted = pipelineSelectedId===d.id
   const actBtns = [
     {type:'call',label:'📞',count:d.calls||0},
     {type:'email',label:'✉',count:d.emails||0},
@@ -608,19 +698,17 @@ function dealCardHTML(d) {
     {type:'proposal',label:'📄',count:d.proposal?1:0},
   ].map(btn=>{
     const locked = btn.type==='proposal' && btn.count>0
-    return `<button class="act-btn${locked?' locked':''}" onclick="${locked?'':`logAct(${d.id},'${btn.type}')`}" style="opacity:1">
+    const clickHandler = locked ? 'event.stopPropagation()' : `event.stopPropagation();logAct(${d.id},'${btn.type}')`
+    return `<button class="act-btn${locked?' locked':''}" onclick="${clickHandler}" style="opacity:1">
       <span style="font-size:13px">${locked?'✓':btn.label}</span>
       ${btn.count>0?`<span class="act-count">${btn.count}</span>`:''}
     </button>`
   }).join('')
 
-  return `<div class="deal-card ${p}">
+  return `<div class="deal-card ${p}" onclick="openDetailPanel(${d.id})" style="cursor:pointer;${isHighlighted?'outline:2px solid var(--green);outline-offset:1px':''}">
     <div style="display:flex;justify-content:space-between;align-items:flex-start">
       ${stageDropHTML(d)}
-      <div style="display:flex;gap:4px">
-        <button onclick="openEdit(${d.id})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px;padding:0 2px">✎</button>
-        <button onclick="deleteDeal(${d.id})" style="background:none;border:none;cursor:pointer;color:#b4b2a9;font-size:14px;padding:0 2px">×</button>
-      </div>
+      <button onclick="event.stopPropagation();deleteDeal(${d.id})" style="background:none;border:none;cursor:pointer;color:#b4b2a9;font-size:14px;padding:0 2px">×</button>
     </div>
     <div class="deal-company">${d.company}</div>
     <div class="deal-title-text">${d.title}</div>
@@ -638,14 +726,14 @@ function dealCardHTML(d) {
 }
 
 function stageDropHTML(d) {
-  const items = STAGES.map(s=>`<div class="stage-drop-item${s===d.stage?' active':''}" onclick="changeStage(${d.id},'${s}')">${s}</div>`).join('')
+  const items = STAGES.map(s=>`<div class="stage-drop-item${s===d.stage?' active':''}" onclick="event.stopPropagation();changeStage(${d.id},'${s}')">${s}</div>`).join('')
   return `<div class="stage-drop-wrap">
-    <div class="stage-drop-trigger" onclick="toggleDrop(this)">${d.stage} <span style="font-size:8px">▼</span></div>
+    <div class="stage-drop-trigger" onclick="event.stopPropagation();toggleDrop(this)">${d.stage} <span style="font-size:8px">▼</span></div>
     <div class="stage-drop-menu" style="display:none">
       ${items}
       <div class="stage-drop-divider"></div>
-      <div class="stage-drop-item won" onclick="changeStage(${d.id},'Closed Won')">Closed Won</div>
-      <div class="stage-drop-item lost" onclick="openLossModal(${d.id})">Closed Lost</div>
+      <div class="stage-drop-item won" onclick="event.stopPropagation();changeStage(${d.id},'Closed Won')">Closed Won</div>
+      <div class="stage-drop-item lost" onclick="event.stopPropagation();openLossModal(${d.id})">Closed Lost</div>
     </div>
   </div>`
 }
@@ -872,7 +960,6 @@ function onTargetBlur(val) {
   const el = document.getElementById('targetInput')
   if (el) el.value = n ? n.toLocaleString('en-US') : ''
   distributeAnnual(n)
-  distributeRepTargets()
   renderForecast()
 }
 function onTargetFocus(el) {
@@ -1093,215 +1180,6 @@ function savePanel() {
 
   closePanel()
   runAI()
-}
-
-// ── TEAM ──────────────────────────────────────────────────────────
-const TEAM_REPS = [
-  {
-    name: 'Diego Salazar', lane: 'Mexico & Central America',
-    deals: [
-      {company:'TechParts LATAM',title:'Auto Components Export',value:120000,stage:'Proposal',date:'2026-05-01',duration:24},
-      {company:'Quimex Industrial',title:'Hazmat Export Lane',value:145000,stage:'Qualified',date:'2026-08-01',duration:18},
-      {company:'AutoMex Parts',title:'Spare Parts Distribution',value:110000,stage:'Negotiation',date:'2026-04-15',duration:18},
-      {company:'TropicFresh CR',title:'Pineapple Export Lane',value:52000,stage:'Qualified',date:'2026-05-15',duration:6},
-      {company:'CosmeticaCR',title:'Express Export Lane',value:27000,stage:'Negotiation',date:'2026-04-15',duration:6},
-    ],
-    won: [{value:105000,date:'2026-03-15',duration:18},{value:88000,date:'2026-03-01',duration:12}]
-  },
-  {
-    name: 'Valentina Mora', lane: 'Colombia & Andean Region',
-    deals: [
-      {company:'Andean Fresh Foods',title:'Reefer Export Lane',value:84000,stage:'Negotiation',date:'2026-04-01',duration:12},
-      {company:'PharmaAndes',title:'Pharma Consolidation',value:91000,stage:'Qualified',date:'2026-05-01',duration:12},
-      {company:'ColTex Apparel',title:'Garments Export Lane',value:33000,stage:'Lead',date:'2026-07-15',duration:6},
-      {company:'ColFlower Export',title:'Perishables Export Lane',value:47000,stage:'Proposal',date:'2026-06-01',duration:6},
-    ],
-    won: [{value:72000,date:'2026-02-01',duration:12}]
-  },
-  {
-    name: 'Rafael Campos', lane: 'Brazil & Southern Cone',
-    deals: [
-      {company:'BioFarm Brasil',title:'FCL Export Lane',value:56000,stage:'Qualified',date:'2026-06-01',duration:12},
-      {company:'BrazilNuts Co',title:'Bulk Commodity Export',value:48000,stage:'Lead',date:'2026-08-15',duration:6},
-      {company:'Vino del Sur',title:'Wine Export Lane',value:67000,stage:'Proposal',date:'2026-06-01',duration:12},
-      {company:'ElectroArg',title:'Electronics Export',value:78000,stage:'Lead',date:'2026-09-01',duration:12},
-      {company:'ChileFrut SA',title:'Stone Fruit Export Lane',value:74000,stage:'Negotiation',date:'2026-04-01',duration:12},
-    ],
-    won: [{value:61000,date:'2026-02-15',duration:12}]
-  },
-  {
-    name: 'Camila Ortega', lane: 'Peru, Ecuador & Guatemala',
-    deals: [
-      {company:'Lima Exports SA',title:'LCL Consolidation',value:38000,stage:'Lead',date:'2026-07-01',duration:6},
-      {company:'AgriPeru Export',title:'Reefer Export Lane',value:62000,stage:'Proposal',date:'2026-06-15',duration:12},
-      {company:'Ecuaflor',title:'Fresh Flowers Export',value:39000,stage:'Proposal',date:'2026-07-01',duration:12},
-      {company:'GuateFresh SA',title:'Perishables Export Lane',value:44000,stage:'Negotiation',date:'2026-04-01',duration:6},
-      {company:'GuateCafe Export',title:'Green Coffee Export',value:58000,stage:'Qualified',date:'2026-06-01',duration:12},
-      {company:'BoliTex Fabrics',title:'Textile Export Consolidation',value:29000,stage:'Lead',date:'2026-09-15',duration:6},
-    ],
-    won: []
-  }
-]
-
-function distributeRepTargets() {
-  const n = TEAM_REPS.length
-  const even = annualTarget > 0 ? Math.round(annualTarget / n) : 0
-  TEAM_REPS.forEach(r => { repTargets[r.name] = even })
-}
-
-function getRepTarget(name) {
-  if (repTargets[name] == null && annualTarget > 0) distributeRepTargets()
-  return repTargets[name] || 0
-}
-
-function saveRepTarget(name, val) {
-  repTargets[name] = parseComma(val) || 0
-  renderTeam()
-}
-
-function resetRepTargets() {
-  distributeRepTargets()
-  renderTeam()
-}
-
-function repGP2026(rep) {
-  const stageW = {Lead:0.1,Qualified:0.3,Proposal:0.6,Negotiation:0.8}
-  let total = 0
-  rep.deals.forEach(d => {
-    const prob = stageW[d.stage]||0.1
-    const monthly = (d.value * prob) / d.duration
-    const start = new Date(d.date)
-    for (let i=0;i<d.duration;i++) {
-      const dt = new Date(start.getFullYear(), start.getMonth()+i, 1)
-      if (dt.getFullYear()===2026) total += monthly
-    }
-  })
-  rep.won.forEach(d => {
-    const monthly = d.value / d.duration
-    const start = new Date(d.date)
-    for (let i=0;i<d.duration;i++) {
-      const dt = new Date(start.getFullYear(), start.getMonth()+i, 1)
-      if (dt.getFullYear()===2026) total += monthly
-    }
-  })
-  return Math.round(total)
-}
-
-function renderTeam() {
-  const el = document.getElementById('view-team')
-  const teamTarget = annualTarget || 0
-  const rankColors = ['gold','silver','bronze','']
-  const rankLabels = ['🥇 #1 — Top performer','🥈 #2','🥉 #3','#4']
-  const medals = ['🥇','🥈','🥉','4️⃣']
-
-  const repsWithGP = TEAM_REPS.map(r => ({
-    ...r,
-    gp2026: repGP2026(r),
-    pipeline: r.deals.reduce((s,d)=>s+d.value,0),
-    dealCount: r.deals.length,
-    repTarget: getRepTarget(r.name)
-  }))
-  const sorted = [...repsWithGP].sort((a,b) => b.gp2026 - a.gp2026)
-  const totalGP = sorted.reduce((s,r) => s+r.gp2026, 0)
-  const maxGP = sorted[0]?.gp2026 || 1
-  const allocatedTotal = sorted.reduce((s,r) => s+r.repTarget, 0)
-  const unallocated = teamTarget - allocatedTotal
-  const pctOfTarget = teamTarget > 0 ? Math.min(1, totalGP / teamTarget) : 0
-
-  // Rep cards
-  const cards = sorted.map((r, i) => {
-    const repPct = maxGP > 0 ? (r.gp2026 / maxGP) : 0
-    const vsTarget = r.repTarget > 0 ? (r.gp2026 / r.repTarget) : 0
-    const barColor = r.repTarget === 0 ? '#d0d8e4' : vsTarget >= 0.8 ? 'var(--green)' : vsTarget >= 0.5 ? 'var(--amber)' : 'var(--red)'
-    const targetPct = r.repTarget > 0 ? Math.round(vsTarget * 100) : null
-    const repName = r.name.replace(/'/g, "\\'")
-    return `
-    <div class="rep-card">
-      <div class="rep-rank ${rankColors[i]}">${rankLabels[i]}</div>
-      <div class="rep-name">${r.name}</div>
-      <div class="rep-lane">${r.lane}</div>
-      <div class="rep-gp">${fmt(r.gp2026)}</div>
-      <div class="rep-gp-label">2026 GP forecast${r.repTarget>0?' · '+targetPct+'% of target':''}</div>
-      <div class="rep-bar-track"><div class="rep-bar-fill" style="width:${Math.round(repPct*100)}%;background:${barColor}"></div></div>
-      <div class="rep-stats">
-        <div class="rep-stat"><div class="rep-stat-val">${r.dealCount}</div><div class="rep-stat-lbl">Active deals</div></div>
-        <div class="rep-stat"><div class="rep-stat-val">${fmt(r.pipeline)}</div><div class="rep-stat-lbl">Pipeline GP</div></div>
-        <div class="rep-stat"><div class="rep-stat-val">${r.won.length}</div><div class="rep-stat-lbl">Closed won</div></div>
-        <div class="rep-stat"><div class="rep-stat-val">${totalGP>0?Math.round((r.gp2026/totalGP)*100):'0'}%</div><div class="rep-stat-lbl">Team share</div></div>
-      </div>
-      <div style="border-top:0.5px solid var(--border);padding-top:10px;margin-top:10px">
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px">Individual target</div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <span style="color:var(--muted);font-size:13px">$</span>
-          <input type="text" value="${r.repTarget>0?r.repTarget.toLocaleString('en-US'):''}"
-            placeholder="${teamTarget>0?(Math.round(teamTarget/TEAM_REPS.length)).toLocaleString('en-US'):'set team target first'}"
-            style="flex:1;padding:5px 8px;border:0.5px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;color:var(--text);outline:none;"
-            onblur="saveRepTarget('${repName}', this.value)"
-            onkeydown="if(event.key==='Enter')this.blur()"
-          />
-        </div>
-      </div>
-    </div>`
-  }).join('')
-
-  // Leaderboard rows
-  const lbRows = sorted.map((r, i) => {
-    const pctOfMax = maxGP > 0 ? (r.gp2026 / maxGP) : 0
-    const teamShare = totalGP > 0 ? Math.round((r.gp2026/totalGP)*100) : 0
-    const vsTarget = r.repTarget > 0 ? Math.round((r.gp2026/r.repTarget)*100) : null
-    const barColor = vsTarget===null?'var(--green)':vsTarget>=80?'var(--green)':vsTarget>=50?'var(--amber)':'var(--red)'
-    return `
-    <div class="lb-row">
-      <div class="lb-rank-num">${medals[i]}</div>
-      <div style="flex:2">
-        <div class="lb-name">${r.name}</div>
-        <div class="lb-lane">${r.lane}</div>
-      </div>
-      <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${Math.round(pctOfMax*100)}%;background:${barColor}"></div></div>
-      <div style="min-width:80px;text-align:right">
-        <div class="lb-gp">${fmt(r.gp2026)}</div>
-        ${r.repTarget>0?`<div style="font-size:10px;color:var(--muted)">of ${fmt(r.repTarget)}</div>`:''}
-      </div>
-      <div class="lb-pct">${vsTarget!==null?vsTarget+'% attain.':teamShare+'% of team'}</div>
-    </div>`
-  }).join('')
-
-  const noTargetNote = teamTarget === 0
-    ? `<div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:8px">Set the team target in the Forecast tab to enable target allocation.</div>` : ''
-
-  const allocationStatus = teamTarget > 0
-    ? `<div style="font-size:12px;color:${Math.abs(unallocated)<100?'var(--green)':'rgba(255,255,255,0.6)'};margin-top:4px">${Math.abs(unallocated)<100?'✓ Fully allocated':'Unallocated: '+fmt(Math.abs(unallocated))+(unallocated<0?' (over-allocated)':'')}</div>` : ''
-
-  el.innerHTML = `
-    <div class="team-target-bar">
-      <div class="team-target-header">
-        <div>
-          <div class="team-target-title">Team GP target 2026</div>
-          <div style="font-size:20px;font-weight:700;color:white;margin-top:4px">${teamTarget>0?fmt(teamTarget):'Not set'}</div>
-          ${allocationStatus}
-          ${noTargetNote}
-        </div>
-        <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-          <div>
-            <div class="team-target-title">Team GP forecast</div>
-            <div style="font-size:20px;font-weight:700;color:${pctOfTarget>=1?'var(--green)':'#FAEEDA'};margin-top:4px">${fmt(totalGP)} <span style="font-size:13px;font-weight:400;color:rgba(255,255,255,0.5)">${teamTarget>0?Math.round(pctOfTarget*100)+'%':''}</span></div>
-          </div>
-          <button onclick="resetRepTargets()" style="font-size:11px;padding:5px 12px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.3);background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;font-family:inherit;" ${teamTarget?'':'disabled'}>↺ Reset to even split</button>
-        </div>
-      </div>
-      ${teamTarget>0?`<div class="team-progress-track" style="margin-top:10px"><div class="team-progress-fill" style="width:${Math.round(pctOfTarget*100)}%"></div></div>
-      <div class="team-progress-labels">
-        <div class="team-progress-label">$0</div>
-        <div class="team-progress-label">${fmt(teamTarget/2)}</div>
-        <div class="team-progress-label">${fmt(teamTarget)}</div>
-      </div>`:''}
-    </div>
-    <div class="team-grid">${cards}</div>
-    <div class="team-leaderboard">
-      <div class="lb-header">Leaderboard — ranked by 2026 GP forecast</div>
-      ${lbRows}
-    </div>
-  `
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────
